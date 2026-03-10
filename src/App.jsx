@@ -128,7 +128,7 @@ const [provider, setProvider] = useState("claude");
         if (src.url && src.parse) {
           src.parse(await fetch(src.url).then(r => r.json())).forEach(i => all.push(i));
         } else {
-          const data = await fetch(`/api/trends?source=${src.id}`).then(r => r.json());
+          const data = await fetch(`/api/trends?source=${src.id}&pilar=${encodeURIComponent(pilar)}&gatilho=${encodeURIComponent(gatilho)}`).then(r => r.json());
           (data.items || []).forEach(i => all.push(i));
         }
       } catch {}
