@@ -11,7 +11,9 @@ export default async function handler(req, res) {
 
   try {
     let body = req.body;
-    if (typeof body === 'string') body = JSON.parse(body);
+    if (!body || typeof body === 'string') {
+      try { body = JSON.parse(body || '{}'); } catch { body = {}; }
+    }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -23,8 +25,12 @@ export default async function handler(req, res) {
       body: JSON.stringify(body),
     });
 
-    const data = await response.json();
-    return res.status(200).json(data);
+    const text = await response.text();
+    try {
+      return res.status(200).json(JSON.parse(text));
+    } catch {
+      return res.status(200).send(text);
+    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
