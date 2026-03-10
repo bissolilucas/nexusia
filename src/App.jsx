@@ -39,9 +39,9 @@ const TRIGGERS = ["Curiosidade", "Medo de ficar para trás", "Dor financeira", "
 const FMT = { "REELS": { color: "#f97316", bg: "#fff7ed" }, "CARROSSEL": { color: "#7c3aed", bg: "#f5f3ff" }, "POST FEED": { color: "#0891b2", bg: "#ecfeff" } };
 
 const FREE_SOURCES = [
-  { id: "reddit_ai", label: "r/artificial", emoji: "🤖", url: "https://www.reddit.com/r/artificial/hot.json?limit=10", parse: d => d.data.children.map(p => ({ source: "Reddit", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
-  { id: "reddit_chatgpt", label: "r/ChatGPT", emoji: "💬", url: "https://www.reddit.com/r/ChatGPT/hot.json?limit=10", parse: d => d.data.children.map(p => ({ source: "Reddit", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
-  { id: "reddit_auto", label: "r/automation", emoji: "⚙️", url: "https://www.reddit.com/r/automation/hot.json?limit=10", parse: d => d.data.children.map(p => ({ source: "Reddit", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
+  { id: "reddit_br", label: "r/brdev", emoji: "🇧🇷", url: "https://www.reddit.com/r/brdev/hot.json?limit=10", parse: d => d.data.children.map(p => ({ source: "Reddit BR", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
+  { id: "reddit_empreend", label: "r/empreendedorismo", emoji: "💼", url: "https://www.reddit.com/r/empreendedorismo/hot.json?limit=10", parse: d => d.data.children.map(p => ({ source: "Reddit BR", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
+  { id: "reddit_ai", label: "r/artificial", emoji: "🤖", url: "https://www.reddit.com/r/artificial/hot.json?limit=10", parse: d => d.data.children.map(p => ({ source: "Reddit AI", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
   { id: "devto", label: "Dev.to AI", emoji: "📝", url: "https://dev.to/api/articles?tag=ai&per_page=10&top=7", parse: d => d.map(a => ({ source: "Dev.to", title: a.title, snippet: a.description||"", score: a.positive_reactions_count })) },
   { id: "hn", label: "Hacker News", emoji: "🔶", url: "https://hacker-news.firebaseio.com/v2/topstories.json?limitToFirst=20&orderBy=%22$key%22", parse: null },
 ];
@@ -98,7 +98,7 @@ export default function App() {
   const [selTrends, setSelTrends] = useState([]);
   const [loadingTrends, setLoadingTrends] = useState(false);
   const [trendsLoaded, setTrendsLoaded] = useState(false);
-  const [activeSrc, setActiveSrc] = useState(["reddit_ai", "devto"]);
+  const [activeSrc, setActiveSrc] = useState(["reddit_br", "reddit_empreend"]);
 
   useEffect(() => {
     load("nexusia_v7", []).then(setGenerated);
