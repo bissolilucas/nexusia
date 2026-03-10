@@ -154,8 +154,27 @@ JSON somente sem markdown: {"tema":"...","gancho":"...","gatilho":"${gatilho}","
         body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1200, messages: [{ role: "user", content: prompt }] }),
       });
       const data = await res.json();
-      const text = data.content?.map(b => b.text || "").join("") || "";
-      const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
+
+if (data.error) {
+  setError("Erro da API: " + (data.error.message || JSON.stringify(data.error)));
+  setLoading(false);
+  return;
+}
+
+if (!data.content || !data.content.length) {
+  setError("Resposta vazia. Verifique sua chave de API.");
+  setLoading(false);
+  return;
+}
+
+const text = data.content.map(b => b.text || "").join("");
+const jsonMatch = text.match(/\{[\s\S]*\}/);
+if (!jsonMatch) {
+  setError("Formato inválido na resposta.");
+  setLoading(false);
+  return;
+}
+const parsed = JSON.parse(jsonMatch[0]);
       parsed.day = nextDay; parsed.fmt = fmt; parsed.date = new Date().toLocaleDateString("pt-BR");
       if (selTrends.length) parsed.trendBased = true;
       const list = [parsed, ...generated];
