@@ -41,7 +41,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const { source, pilar, gatilho } = req.query;
+  const { source, pilar, gatilho, tema } = req.query;
   if (!source || !QUERIES[source]) {
     return res.status(400).json({ error: 'Fonte inválida', items: [] });
   }
@@ -62,8 +62,14 @@ export default async function handler(req, res) {
     queryIndex = Math.floor(Math.random() * queries.length);
   }
 
-  const query = encodeURIComponent(queries[queryIndex]);
-  const url = `https://news.google.com/rss/search?q=${query}&hl=pt-BR&gl=BR&ceid=BR:pt-419`;
+let searchQuery;
+  if (tema && tema.trim().length > 2) {
+    const sourceLabel = { instagram: "instagram reels", tiktok: "tiktok viral", youtube: "youtube shorts", ia_br: "empresas brasil" }[source] || source;
+    searchQuery = encodeURIComponent(`${tema} ${sourceLabel} brasil`);
+  } else {
+    searchQuery = encodeURIComponent(queries[queryIndex]);
+  }
+  const url = `https://news.google.com/rss/search?q=${searchQuery}&hl=pt-BR&gl=BR&ceid=BR:pt-419`;
 
   try {
     const response = await fetch(url, {
