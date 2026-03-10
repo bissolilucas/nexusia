@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const PLANNER = [
   { day: 1, format: "REELS", tema: "Empresas que não usam IA vão desaparecer", gancho: "Empresas que não usam inteligência artificial vão desaparecer nos próximos anos.", gatilho: "Medo de ficar para trás", pilar: "Autoridade em IA", roteiro: `Hoje existem dois tipos de empresa no mercado.\n\nAs que já usam inteligência artificial para responder clientes, organizar agenda e fechar vendas automaticamente.\n\nE as que ainda fazem tudo isso na mão, dependendo de uma pessoa para cada tarefa.\n\nEnquanto você demora para responder uma mensagem no WhatsApp, o seu concorrente já respondeu com automação, já coletou os dados do cliente e já agendou o atendimento.\n\nNo mercado atual existe uma regra simples e cruel: quem responde primeiro, vende.\n\nNão é uma questão de tamanho de empresa. É uma questão de velocidade.\n\nE velocidade hoje se chama automação com inteligência artificial.\n\nA pergunta não é mais SE você vai usar IA no seu negócio.\n\nA pergunta é: quando você vai começar?`, legenda: `A revolução da inteligência artificial já começou.\n\nEmpresas estão automatizando atendimento, agenda e vendas enquanto outras ainda respondem clientes manualmente.\n\nQuem responde primeiro, vende. Simples assim.`, cta: "Comente IA que eu te mostro como funciona no seu negócio." },
@@ -36,422 +36,574 @@ const PLANNER = [
 const FORMATS = ["REELS", "CARROSSEL", "POST FEED"];
 const PILLARS = ["Autoridade em IA", "Educação do mercado", "Prova social", "Bastidores de automação", "Conteúdo viral"];
 const TRIGGERS = ["Curiosidade", "Medo de ficar para trás", "Dor financeira", "Prova social", "Quebra de crença", "Choque", "Oportunidade", "Transformação", "Visão de futuro", "Autoridade", "Resultado", "Diagnóstico", "Analogia simples"];
-const FORMAT_COLORS = { "REELS": "#f97316", "CARROSSEL": "#8b5cf6", "POST FEED": "#06b6d4" };
-const FORMAT_BG = { "REELS": "#fff7ed", "CARROSSEL": "#f5f3ff", "POST FEED": "#ecfeff" };
+
+const FMT = {
+  "REELS":     { color: "#f97316", bg: "#fff7ed", dot: "#fb923c" },
+  "CARROSSEL": { color: "#7c3aed", bg: "#f5f3ff", dot: "#a78bfa" },
+  "POST FEED": { color: "#0891b2", bg: "#ecfeff", dot: "#22d3ee" },
+};
 
 const FREE_SOURCES = [
-  { id: "reddit_ai", label: "Reddit r/artificial", emoji: "🤖", url: "https://www.reddit.com/r/artificial/hot.json?limit=10", parse: (d) => d.data.children.map(p => ({ source: "Reddit /r/artificial", title: p.data.title, snippet: p.data.selftext?.slice(0, 120) || "Discussão em alta", score: p.data.score })) },
-  { id: "reddit_chatgpt", label: "Reddit r/ChatGPT", emoji: "💬", url: "https://www.reddit.com/r/ChatGPT/hot.json?limit=10", parse: (d) => d.data.children.map(p => ({ source: "Reddit /r/ChatGPT", title: p.data.title, snippet: p.data.selftext?.slice(0, 120) || "Discussão em alta", score: p.data.score })) },
-  { id: "reddit_automation", label: "Reddit r/automation", emoji: "⚙️", url: "https://www.reddit.com/r/automation/hot.json?limit=10", parse: (d) => d.data.children.map(p => ({ source: "Reddit /r/automation", title: p.data.title, snippet: p.data.selftext?.slice(0, 120) || "Discussão em alta", score: p.data.score })) },
-  { id: "devto", label: "Dev.to — IA & Tech", emoji: "👨‍💻", url: "https://dev.to/api/articles?tag=ai&per_page=10&top=7", parse: (d) => d.map(a => ({ source: "Dev.to", title: a.title, snippet: a.description || "", score: a.positive_reactions_count })) },
-  { id: "hn", label: "Hacker News", emoji: "🔶", url: "https://hacker-news.firebaseio.com/v2/topstories.json?limitToFirst=20&orderBy=%22$key%22", parse: null },
+  { id: "reddit_ai",       label: "r/artificial",  emoji: "🤖", url: "https://www.reddit.com/r/artificial/hot.json?limit=10",  parse: d => d.data.children.map(p => ({ source: "Reddit", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
+  { id: "reddit_chatgpt",  label: "r/ChatGPT",     emoji: "💬", url: "https://www.reddit.com/r/ChatGPT/hot.json?limit=10",     parse: d => d.data.children.map(p => ({ source: "Reddit", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
+  { id: "reddit_auto",     label: "r/automation",  emoji: "⚙️", url: "https://www.reddit.com/r/automation/hot.json?limit=10",  parse: d => d.data.children.map(p => ({ source: "Reddit", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
+  { id: "devto",           label: "Dev.to AI",     emoji: "📝", url: "https://dev.to/api/articles?tag=ai&per_page=10&top=7",  parse: d => d.map(a => ({ source: "Dev.to", title: a.title, snippet: a.description||"", score: a.positive_reactions_count })) },
+  { id: "hn",              label: "Hacker News",   emoji: "🔶", url: "https://hacker-news.firebaseio.com/v2/topstories.json?limitToFirst=20&orderBy=%22$key%22", parse: null },
 ];
 
-async function store(key, val) { try { await window.storage.set(key, JSON.stringify(val)); } catch {} }
-async function load(key, def) { try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : def; } catch { return def; } }
+async function store(k, v) { try { await window.storage.set(k, JSON.stringify(v)); } catch {} }
+async function load(k, d)  { try { const r = await window.storage.get(k); return r ? JSON.parse(r.value) : d; } catch { return d; } }
+
+// ── CSS injected once ──────────────────────────────────────────────────────
+const CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f5f5f7; }
+  select { appearance: none; }
+
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+  @keyframes spin     { to { transform: rotate(360deg); } }
+  @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @keyframes shimmer  { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  @keyframes popIn    { 0%{transform:scale(.92);opacity:0} 60%{transform:scale(1.03)} 100%{transform:scale(1);opacity:1} }
+
+  .fade-up   { animation: fadeUp  .45s cubic-bezier(.22,1,.36,1) both; }
+  .fade-in   { animation: fadeIn  .3s ease both; }
+  .pop-in    { animation: popIn   .4s cubic-bezier(.22,1,.36,1) both; }
+
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 24px rgba(0,0,0,.05);
+    transition: box-shadow .2s, transform .2s;
+  }
+  .card:hover { box-shadow: 0 2px 4px rgba(0,0,0,.05), 0 8px 32px rgba(0,0,0,.08); }
+
+  .btn-primary {
+    width:100%; padding:14px; border-radius:14px; border:none;
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:#fff; font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:700; font-size:15px; cursor:pointer;
+    box-shadow: 0 4px 16px rgba(99,102,241,.35);
+    transition: transform .15s, box-shadow .15s, background .2s;
+  }
+  .btn-primary:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 24px rgba(99,102,241,.45); }
+  .btn-primary:active:not(:disabled){ transform:translateY(0); }
+  .btn-primary:disabled { background:#e5e7eb; color:#9ca3af; box-shadow:none; cursor:not-allowed; }
+
+  .btn-ghost {
+    padding:7px 16px; border-radius:10px;
+    border:1.5px solid #e5e7eb; background:#fff;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600; font-size:12px; cursor:pointer;
+    transition: all .15s;
+  }
+  .btn-ghost:hover { border-color:#6366f1; color:#6366f1; background:#f5f3ff; }
+
+  .input-field {
+    width:100%; padding:11px 14px; border-radius:12px;
+    border:1.5px solid #e5e7eb; background:#fafafa;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:14px; color:#111; outline:none;
+    transition: border-color .15s, background .15s;
+  }
+  .input-field:focus { border-color:#6366f1; background:#fff; box-shadow:0 0 0 3px rgba(99,102,241,.1); }
+
+  .tab-btn {
+    padding:8px 20px; border-radius:10px; border:none;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600; font-size:13px; cursor:pointer;
+    transition: all .2s;
+  }
+
+  .trend-item {
+    padding:10px 12px; border-radius:12px;
+    border:1.5px solid #f3f4f6; background:#fafafa;
+    cursor:pointer; transition: all .15s;
+  }
+  .trend-item:hover { border-color:#c4b5fd; background:#faf5ff; }
+  .trend-item.selected { border-color:#6366f1; background:#f5f3ff; }
+
+  .planner-row {
+    background:#fff; border-radius:14px;
+    border:1.5px solid transparent;
+    transition: border-color .2s, box-shadow .2s;
+    overflow:hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  }
+  .planner-row:hover { box-shadow:0 2px 8px rgba(0,0,0,.07); }
+
+  .copy-btn {
+    padding:7px 16px; border-radius:10px;
+    border:1.5px solid #e5e7eb; background:#fff;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:600; font-size:12px; cursor:pointer;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .copy-btn.copied { border-color:#22c55e; background:#f0fdf4; color:#16a34a; }
+  .copy-btn:not(.copied):hover { border-color:#6366f1; color:#6366f1; }
+
+  .source-chip {
+    padding:4px 10px; border-radius:8px;
+    font-size:11px; font-weight:600; cursor:pointer;
+    transition:all .15s; border:1.5px solid #e5e7eb;
+    background:#fafafa; color:#6b7280;
+  }
+  .source-chip.active { border-color:#6366f1; background:#eef2ff; color:#4338ca; }
+
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:3px; }
+`;
 
 export default function App() {
-  const [tab, setTab] = useState("gerar");
-  const [generated, setGenerated] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState("");
-  const [fmt, setFmt] = useState("REELS");
-  const [pilar, setPilar] = useState("Autoridade em IA");
-  const [gatilho, setGatilho] = useState("Curiosidade");
-  const [temaInput, setTemaInput] = useState("");
-  const [copied, setCopied] = useState(null);
-  const [expanded, setExpanded] = useState(null);
+  const [tab, setTab]               = useState("gerar");
+  const [generated, setGenerated]   = useState([]);
+  const [loading, setLoading]       = useState(false);
+  const [result, setResult]         = useState(null);
+  const [error, setError]           = useState("");
+  const [fmt, setFmt]               = useState("REELS");
+  const [pilar, setPilar]           = useState("Autoridade em IA");
+  const [gatilho, setGatilho]       = useState("Curiosidade");
+  const [temaInput, setTemaInput]   = useState("");
+  const [copied, setCopied]         = useState(null);
+  const [expanded, setExpanded]     = useState(null);
   const [plannerOpen, setPlannerOpen] = useState(null);
-  const [trends, setTrends] = useState([]);
-  const [selectedTrends, setSelectedTrends] = useState([]);
+  const [trends, setTrends]         = useState([]);
+  const [selTrends, setSelTrends]   = useState([]);
   const [loadingTrends, setLoadingTrends] = useState(false);
-  const [trendsLoaded, setTrendsLoaded] = useState(false);
-  const [activeSources, setActiveSources] = useState(["reddit_ai", "devto"]);
+  const [trendsLoaded, setTrendsLoaded]   = useState(false);
+  const [activeSrc, setActiveSrc]   = useState(["reddit_ai","devto"]);
 
   useEffect(() => {
-    load("nexusia_v6_gen", []).then(setGenerated);
-    const link = document.createElement("link");
-    link.href = "https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap";
-    link.rel = "stylesheet";
-    document.head.appendChild(link);
+    load("nexusia_v7", []).then(setGenerated);
+    const s = document.createElement("style");
+    s.textContent = CSS;
+    document.head.appendChild(s);
   }, []);
 
   const usedThemes = [...PLANNER.map(c => c.tema), ...generated.map(c => c.tema)];
-  const nextDay = 30 + generated.length + 1;
+  const nextDay    = 30 + generated.length + 1;
 
+  // ── FETCH TRENDS ──────────────────────────────────────────────────────────
   const fetchTrends = async () => {
-    setLoadingTrends(true);
-    setTrends([]);
-    setSelectedTrends([]);
-    setTrendsLoaded(false);
+    setLoadingTrends(true); setTrends([]); setSelTrends([]); setTrendsLoaded(false);
     const all = [];
-
-    for (const src of FREE_SOURCES.filter(s => activeSources.includes(s.id))) {
+    for (const src of FREE_SOURCES.filter(s => activeSrc.includes(s.id))) {
       try {
         if (src.id === "hn") {
-          const ids = await fetch(src.url).then(r => r.json());
-          const top = Array.isArray(ids) ? ids.slice(0, 12) : Object.values(ids).slice(0, 12);
+          const ids  = await fetch(src.url).then(r => r.json());
+          const top  = Array.isArray(ids) ? ids.slice(0,12) : Object.values(ids).slice(0,12);
           const items = await Promise.all(top.map(id => fetch(`https://hacker-news.firebaseio.com/v2/item/${id}.json`).then(r => r.json())));
-          items.filter(i => i && i.title).forEach(i => {
-            all.push({ source: "Hacker News", title: i.title, snippet: i.url || "", score: i.score || 0 });
-          });
+          items.filter(i => i?.title).forEach(i => all.push({ source:"HN", title:i.title, snippet:i.url||"", score:i.score||0 }));
         } else {
-          const data = await fetch(src.url).then(r => r.json());
-          src.parse(data).forEach(i => all.push(i));
+          src.parse(await fetch(src.url).then(r => r.json())).forEach(i => all.push(i));
         }
-      } catch (e) { console.log(src.id, e); }
+      } catch {}
     }
-
-    // Filter AI/automation relevant
-    const keywords = ["ai", "artificial intelligence", "automation", "chatgpt", "llm", "gpt", "machine learning", "bot", "workflow", "crm", "whatsapp", "atendimento", "ia ", "automat"];
-    const filtered = all.filter(t => keywords.some(k => (t.title + " " + t.snippet).toLowerCase().includes(k)));
-    const final = (filtered.length > 3 ? filtered : all).sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 20);
-
-    setTrends(final);
-    setTrendsLoaded(true);
-    setLoadingTrends(false);
+    const kw = ["ai","artificial","automat","chatgpt","llm","gpt","bot","workflow","crm","whatsapp","ia "];
+    const filtered = all.filter(t => kw.some(k => (t.title+" "+t.snippet).toLowerCase().includes(k)));
+    setTrends((filtered.length > 3 ? filtered : all).sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,20));
+    setTrendsLoaded(true); setLoadingTrends(false);
   };
 
-  const toggleSource = (id) => setActiveSources(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  const toggleTrend = (i) => setSelectedTrends(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]);
-
+  // ── GENERATE ─────────────────────────────────────────────────────────────
   const generate = async () => {
     setLoading(true); setResult(null); setError("");
-    const trendCtx = selectedTrends.length > 0
-      ? `\n\nTENDÊNCIAS EM ALTA AGORA (use como base para tornar o roteiro atual e viral):\n${selectedTrends.map(i => `- [${trends[i].source}] ${trends[i].title}${trends[i].snippet ? ": " + trends[i].snippet.slice(0, 100) : ""}`).join("\n")}`
+    const tCtx = selTrends.length
+      ? `\n\nTENDÊNCIAS EM ALTA (incorpore):\n${selTrends.map(i=>`- [${trends[i].source}] ${trends[i].title}`).join("\n")}`
       : "";
-
-    const prompt = `Você é especialista em marketing digital de Automação e IA para empresas brasileiras.
-Crie roteiro COMPLETO (~60 segundos de fala) para Lucas Bissoli da NexusIA.
-
-FORMATO: ${fmt} | PILAR: ${pilar} | GATILHO: ${gatilho}
-${temaInput ? `TEMA SUGERIDO: ${temaInput}` : ""}${trendCtx}
-
-TEMAS JÁ USADOS — NÃO REPETIR NENHUM:
-${usedThemes.map((t, i) => `${i + 1}. ${t}`).join("\n")}
-
-REGRAS:
-- Tema 100% diferente dos acima
-- Linguagem direta, impactante, brasileira
-- Público: donos de empresa, gestores, empreendedores
-- ${fmt === "REELS" ? "Roteiro narrado em voz, ~130-150 palavras (60s). Gancho forte, desenvolvimento, fechamento impactante." : fmt === "CARROSSEL" ? "Slides numerados com conteúdo detalhado de cada slide." : "Texto para imagem + legenda poderosa."}
-
-Responda SOMENTE JSON válido sem markdown:
-{"tema":"...","gancho":"...","gatilho":"${gatilho}","pilar":"${pilar}","roteiro":"...","legenda":"...","cta":"..."}`;
-
+    const prompt = `Especialista em marketing digital de IA/Automação para empresas brasileiras.
+Crie roteiro COMPLETO (~60s) para Lucas Bissoli da NexusIA.
+FORMATO:${fmt} | PILAR:${pilar} | GATILHO:${gatilho}
+${temaInput?`TEMA SUGERIDO:${temaInput}`:""}${tCtx}
+TEMAS USADOS — NÃO REPETIR:
+${usedThemes.map((t,i)=>`${i+1}.${t}`).join("\n")}
+Linguagem direta, brasileira. ${fmt==="REELS"?"~130-150 palavras narradas.":fmt==="CARROSSEL"?"Slides numerados com conteúdo.":"Texto imagem + legenda."}
+JSON somente: {"tema":"...","gancho":"...","gatilho":"${gatilho}","pilar":"${pilar}","roteiro":"...","legenda":"...","cta":"..."}`;
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1200, messages: [{ role: "user", content: prompt }] }),
+      const res  = await fetch("https://api.anthropic.com/v1/messages", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1200, messages:[{role:"user",content:prompt}] }),
       });
       const data = await res.json();
-      const text = data.content?.map(b => b.text || "").join("") || "";
-      const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
-      parsed.day = nextDay; parsed.fmt = fmt; parsed.date = new Date().toLocaleDateString("pt-BR");
-      if (selectedTrends.length > 0) parsed.trendBased = true;
-      const newList = [parsed, ...generated];
-      setGenerated(newList); await store("nexusia_v6_gen", newList); setResult(parsed);
-    } catch { setError("Erro ao gerar roteiro. Tente novamente."); }
+      const text = data.content?.map(b=>b.text||"").join("")||"";
+      const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
+      parsed.day  = nextDay; parsed.fmt = fmt; parsed.date = new Date().toLocaleDateString("pt-BR");
+      if (selTrends.length) parsed.trendBased = true;
+      const list = [parsed, ...generated];
+      setGenerated(list); await store("nexusia_v7", list); setResult(parsed);
+    } catch { setError("Erro ao gerar. Tente novamente."); }
     setLoading(false);
   };
 
   const copyItem = (item, id) => {
-    navigator.clipboard.writeText(`📌 DIA ${item.day} — ${item.fmt || item.format}\n\n🎯 TEMA:\n${item.tema}\n\n🪝 GANCHO:\n${item.gancho}\n\n⚡ GATILHO: ${item.gatilho}\n\n🎬 ROTEIRO:\n${item.roteiro}\n\n📝 LEGENDA:\n${item.legenda}\n\n📣 CTA:\n${item.cta}`);
-    setCopied(id); setTimeout(() => setCopied(null), 2000);
+    navigator.clipboard.writeText(
+      `📌 DIA ${item.day} — ${item.fmt||item.format}\n\n🎯 TEMA:\n${item.tema}\n\n🪝 GANCHO:\n${item.gancho}\n\n⚡ GATILHO: ${item.gatilho}\n\n🎬 ROTEIRO:\n${item.roteiro}\n\n📝 LEGENDA:\n${item.legenda}\n\n📣 CTA:\n${item.cta}`
+    );
+    setCopied(id); setTimeout(()=>setCopied(null), 2000);
   };
 
-  const delGenerated = async (i) => {
-    const l = generated.filter((_, x) => x !== i);
-    setGenerated(l); await store("nexusia_v6_gen", l);
+  const delGen = async (i) => {
+    const l = generated.filter((_,x)=>x!==i);
+    setGenerated(l); await store("nexusia_v7", l);
   };
 
-  const sy = { fontFamily: "'Syne', sans-serif" };
-  const dm = { fontFamily: "'DM Sans', sans-serif" };
-
+  // ── RENDER ────────────────────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: "100vh", background: "#f8f5f0", ...dm }}>
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -200, right: -200, width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.07) 0%, transparent 70%)" }} />
-        <div style={{ position: "absolute", bottom: -100, left: -100, width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(249,115,22,0.05) 0%, transparent 70%)" }} />
-      </div>
+    <div style={{ minHeight:"100vh", background:"#f5f5f7", fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
 
-      {/* HEADER */}
-      <header style={{ position: "relative", zIndex: 10, background: "rgba(15,15,15,0.97)" }}>
-        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 68 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 11, background: "linear-gradient(135deg,#10b981,#f97316)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: "#fff", fontSize: 18, ...sy, fontWeight: 800 }}>N</span>
+      {/* ── HEADER ── */}
+      <header style={{ background:"rgba(255,255,255,.85)", backdropFilter:"blur(20px)", borderBottom:"1px solid rgba(0,0,0,.06)", position:"sticky", top:0, zIndex:100 }}>
+        <div style={{ maxWidth:1160, margin:"0 auto", padding:"0 28px", height:64, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+
+          {/* Logo */}
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 12px rgba(99,102,241,.3)" }}>
+              <span style={{ color:"#fff", fontWeight:800, fontSize:16 }}>N</span>
             </div>
             <div>
-              <div style={{ ...sy, fontWeight: 800, fontSize: 18, color: "#fff", letterSpacing: -0.5 }}>NexusIA</div>
-              <div style={{ fontSize: 10, color: "#6b7280", letterSpacing: 1.5, textTransform: "uppercase" }}>Agente de Conteúdo</div>
+              <div style={{ fontWeight:800, fontSize:17, color:"#111", letterSpacing:"-0.4px" }}>NexusIA</div>
+              <div style={{ fontSize:10, color:"#9ca3af", letterSpacing:"1.2px", textTransform:"uppercase" }}>Agente de Conteúdo</div>
             </div>
           </div>
-          <nav style={{ display: "flex", gap: 4, background: "#1a1a1a", borderRadius: 12, padding: 4 }}>
-            {[["gerar","Gerar"],["historico","Histórico"],["planner","Planner 30D"]].map(([id, label]) => (
-              <button key={id} onClick={() => setTab(id)} style={{ ...sy, fontWeight: tab === id ? 700 : 500, fontSize: 13, background: tab === id ? "linear-gradient(135deg,#10b981,#059669)" : "transparent", color: tab === id ? "#fff" : "#9ca3af", border: "none", borderRadius: 8, padding: "8px 18px", cursor: "pointer" }}>{label}</button>
+
+          {/* Nav */}
+          <nav style={{ display:"flex", gap:2, background:"#f5f5f7", borderRadius:12, padding:4 }}>
+            {[["gerar","Gerar"],["historico","Histórico"],["planner","Planner 30D"]].map(([id,label])=>(
+              <button key={id} className="tab-btn" onClick={()=>setTab(id)} style={{
+                background: tab===id ? "#fff" : "transparent",
+                color: tab===id ? "#6366f1" : "#6b7280",
+                boxShadow: tab===id ? "0 1px 4px rgba(0,0,0,.1)" : "none",
+              }}>{label}</button>
             ))}
           </nav>
-          <div style={{ fontSize: 12, color: "#4b5563" }}>
-            <span style={{ color: "#10b981", fontWeight: 600 }}>{usedThemes.length}</span> temas · dia <span style={{ color: "#10b981", fontWeight: 600 }}>{nextDay}</span>
+
+          {/* Stats */}
+          <div style={{ display:"flex", alignItems:"center", gap:8, background:"#f5f5f7", borderRadius:10, padding:"7px 14px" }}>
+            <div style={{ width:7, height:7, borderRadius:"50%", background:"#22c55e", animation:"pulse 2s infinite" }} />
+            <span style={{ fontSize:13, color:"#374151", fontWeight:500 }}>
+              <strong style={{ color:"#6366f1" }}>{usedThemes.length}</strong> temas · dia <strong style={{ color:"#6366f1" }}>{nextDay}</strong>
+            </span>
           </div>
         </div>
       </header>
 
-      <main style={{ position: "relative", zIndex: 1, maxWidth: 1180, margin: "0 auto", padding: "32px" }}>
+      <main style={{ maxWidth:1160, margin:"0 auto", padding:"32px 28px" }}>
 
-        {/* GERAR */}
+        {/* ══ GERAR ══ */}
         {tab === "gerar" && (
-          <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 24, alignItems: "start" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div className="fade-in" style={{ display:"grid", gridTemplateColumns:"350px 1fr", gap:20, alignItems:"start" }}>
 
-              {/* Config */}
-              <div style={{ background: "#fff", borderRadius: 24, padding: 28, boxShadow: "0 1px 3px rgba(0,0,0,0.05),0 8px 32px rgba(0,0,0,0.04)" }}>
-                <h2 style={{ ...sy, fontWeight: 800, fontSize: 20, color: "#111", margin: "0 0 4px" }}>Novo Roteiro</h2>
-                <p style={{ ...dm, color: "#9ca3af", fontSize: 13, margin: "0 0 24px" }}>Configure e gere conteúdo único</p>
+            {/* LEFT */}
+            <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
 
-                <Lbl sy={sy}>Formato</Lbl>
-                <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-                  {FORMATS.map(f => <button key={f} onClick={() => setFmt(f)} style={{ flex: 1, padding: "9px 0", borderRadius: 10, border: `2px solid ${fmt === f ? FORMAT_COLORS[f] : "#e5e7eb"}`, background: fmt === f ? FORMAT_BG[f] : "#fafafa", color: fmt === f ? FORMAT_COLORS[f] : "#9ca3af", ...sy, fontWeight: 700, fontSize: 10, cursor: "pointer" }}>{f}</button>)}
+              {/* Config card */}
+              <div className="card fade-up" style={{ padding:28 }}>
+                <div style={{ marginBottom:24 }}>
+                  <h2 style={{ fontWeight:800, fontSize:21, color:"#111", letterSpacing:"-0.5px" }}>Novo Roteiro</h2>
+                  <p style={{ fontSize:13, color:"#9ca3af", marginTop:3 }}>Configure e gere conteúdo único</p>
                 </div>
 
-                <Lbl sy={sy}>Pilar</Lbl>
-                <select value={pilar} onChange={e => setPilar(e.target.value)} style={sel(dm)}>{PILLARS.map(p => <option key={p}>{p}</option>)}</select>
+                {/* Format */}
+                <Label>Formato</Label>
+                <div style={{ display:"flex", gap:8, marginBottom:20 }}>
+                  {FORMATS.map(f=>(
+                    <button key={f} onClick={()=>setFmt(f)} style={{
+                      flex:1, padding:"9px 0", borderRadius:11,
+                      border:`2px solid ${fmt===f ? FMT[f].color : "#e5e7eb"}`,
+                      background: fmt===f ? FMT[f].bg : "#fafafa",
+                      color: fmt===f ? FMT[f].color : "#9ca3af",
+                      fontFamily:"'Plus Jakarta Sans',sans-serif",
+                      fontWeight:700, fontSize:10, letterSpacing:"0.5px",
+                      cursor:"pointer", transition:"all .15s",
+                      transform: fmt===f ? "scale(1.02)" : "scale(1)",
+                    }}>{f}</button>
+                  ))}
+                </div>
 
-                <Lbl sy={sy}>Gatilho</Lbl>
-                <select value={gatilho} onChange={e => setGatilho(e.target.value)} style={sel(dm)}>{TRIGGERS.map(t => <option key={t}>{t}</option>)}</select>
+                <Label>Pilar de Conteúdo</Label>
+                <select className="input-field" value={pilar} onChange={e=>setPilar(e.target.value)} style={{ marginBottom:16 }}>
+                  {PILLARS.map(p=><option key={p}>{p}</option>)}
+                </select>
 
-                <Lbl sy={sy}>Tema sugerido <span style={{ color: "#d1d5db", fontWeight: 400 }}>(opcional)</span></Lbl>
-                <input value={temaInput} onChange={e => setTemaInput(e.target.value)} placeholder="ex: IA para pet shops..." style={{ ...sel(dm), marginBottom: 20 }} />
+                <Label>Gatilho Emocional</Label>
+                <select className="input-field" value={gatilho} onChange={e=>setGatilho(e.target.value)} style={{ marginBottom:16 }}>
+                  {TRIGGERS.map(t=><option key={t}>{t}</option>)}
+                </select>
 
-                {selectedTrends.length > 0 && (
-                  <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#166534" }}>
-                    ✅ <strong>{selectedTrends.length}</strong> tendência{selectedTrends.length > 1 ? "s" : ""} incorporada{selectedTrends.length > 1 ? "s" : ""}
+                <Label>Tema sugerido <span style={{ color:"#d1d5db", fontWeight:400 }}>(opcional)</span></Label>
+                <input className="input-field" value={temaInput} onChange={e=>setTemaInput(e.target.value)} placeholder="ex: IA para pet shops..." style={{ marginBottom:20 }} />
+
+                {selTrends.length > 0 && (
+                  <div className="fade-up" style={{ display:"flex", alignItems:"center", gap:8, background:"#f0fdf4", border:"1.5px solid #bbf7d0", borderRadius:10, padding:"10px 14px", marginBottom:18 }}>
+                    <span style={{ fontSize:16 }}>✅</span>
+                    <span style={{ fontSize:13, color:"#166534", fontWeight:600 }}>{selTrends.length} tendência{selTrends.length>1?"s":""} incorporada{selTrends.length>1?"s":""}</span>
                   </div>
                 )}
 
-                <button onClick={generate} disabled={loading} style={{ width: "100%", padding: 15, borderRadius: 14, border: "none", background: loading ? "#e5e7eb" : "linear-gradient(135deg,#10b981,#059669)", color: loading ? "#9ca3af" : "#fff", ...sy, fontWeight: 800, fontSize: 15, cursor: loading ? "not-allowed" : "pointer", boxShadow: loading ? "none" : "0 4px 20px rgba(16,185,129,0.3)" }}>
-                  {loading ? "Gerando roteiro..." : "▶  Gerar Roteiro"}
+                <button className="btn-primary" onClick={generate} disabled={loading}>
+                  {loading
+                    ? <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+                        <span style={{ width:16, height:16, border:"2.5px solid rgba(255,255,255,.3)", borderTop:"2.5px solid #fff", borderRadius:"50%", display:"inline-block", animation:"spin 1s linear infinite" }}/>
+                        Gerando roteiro...
+                      </span>
+                    : "▶  Gerar Roteiro"}
                 </button>
-                {error && <div style={{ color: "#ef4444", fontSize: 13, marginTop: 10 }}>{error}</div>}
+                {error && <p style={{ color:"#ef4444", fontSize:13, marginTop:10 }}>{error}</p>}
               </div>
 
-              {/* Trends — FREE ONLY */}
-              <div style={{ background: "#fff", borderRadius: 24, padding: 28, boxShadow: "0 1px 3px rgba(0,0,0,0.05),0 8px 32px rgba(0,0,0,0.04)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+              {/* Trends card */}
+              <div className="card fade-up" style={{ padding:24, animationDelay:".05s" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:14 }}>
                   <div>
-                    <h3 style={{ ...sy, fontWeight: 800, fontSize: 16, color: "#111", margin: 0 }}>📡 Tendências Gratuitas</h3>
-                    <p style={{ ...dm, fontSize: 12, color: "#9ca3af", margin: "3px 0 0" }}>Reddit · Dev.to · Hacker News — 100% grátis</p>
+                    <h3 style={{ fontWeight:700, fontSize:15, color:"#111" }}>📡 Tendências Agora</h3>
+                    <p style={{ fontSize:11, color:"#9ca3af", marginTop:2 }}>Reddit · Dev.to · HN — 100% grátis</p>
                   </div>
-                  <button onClick={fetchTrends} disabled={loadingTrends} style={{ padding: "8px 14px", borderRadius: 10, border: "none", background: loadingTrends ? "#e5e7eb" : "linear-gradient(135deg,#6366f1,#8b5cf6)", color: loadingTrends ? "#9ca3af" : "#fff", ...sy, fontWeight: 700, fontSize: 12, cursor: loadingTrends ? "not-allowed" : "pointer", flexShrink: 0 }}>
-                    {loadingTrends ? "..." : "🔄 Buscar"}
+                  <button onClick={fetchTrends} disabled={loadingTrends} style={{
+                    padding:"7px 14px", borderRadius:10, border:"none",
+                    background: loadingTrends ? "#e5e7eb" : "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                    color: loadingTrends ? "#9ca3af" : "#fff",
+                    fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, fontSize:12,
+                    cursor: loadingTrends ? "not-allowed" : "pointer",
+                    boxShadow: loadingTrends ? "none" : "0 2px 8px rgba(99,102,241,.3)",
+                  }}>
+                    {loadingTrends
+                      ? <span style={{ display:"flex", alignItems:"center", gap:6 }}>
+                          <span style={{ width:12, height:12, border:"2px solid #d1d5db", borderTop:"2px solid #9ca3af", borderRadius:"50%", display:"inline-block", animation:"spin 1s linear infinite" }}/>
+                          Buscando
+                        </span>
+                      : "🔄 Buscar"}
                   </button>
                 </div>
 
-                {/* Source toggles */}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
-                  {FREE_SOURCES.map(s => (
-                    <button key={s.id} onClick={() => toggleSource(s.id)} style={{ padding: "4px 10px", borderRadius: 8, border: `1px solid ${activeSources.includes(s.id) ? "#6366f1" : "#e5e7eb"}`, background: activeSources.includes(s.id) ? "#eef2ff" : "#fafafa", color: activeSources.includes(s.id) ? "#4338ca" : "#9ca3af", fontSize: 11, ...sy, fontWeight: 600, cursor: "pointer" }}>
+                {/* Source chips */}
+                <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom:14 }}>
+                  {FREE_SOURCES.map(s=>(
+                    <button key={s.id} className={`source-chip${activeSrc.includes(s.id)?" active":""}`} onClick={()=>setActiveSrc(p=>p.includes(s.id)?p.filter(x=>x!==s.id):[...p,s.id])}>
                       {s.emoji} {s.label}
                     </button>
                   ))}
                 </div>
 
                 {!trendsLoaded && !loadingTrends && (
-                  <div style={{ textAlign: "center", padding: "20px 0", color: "#d1d5db" }}>
-                    <div style={{ fontSize: 28, marginBottom: 8 }}>📡</div>
-                    <div style={{ fontSize: 13 }}>Selecione as fontes e clique em Buscar</div>
-                    <div style={{ fontSize: 11, color: "#e5e7eb", marginTop: 4 }}>Sem custo · Sem cadastro · Atualizado agora</div>
-                  </div>
-                )}
-
-                {loadingTrends && (
-                  <div style={{ textAlign: "center", padding: "20px 0" }}>
-                    <div style={{ width: 28, height: 28, borderRadius: "50%", border: "3px solid #e5e7eb", borderTop: "3px solid #8b5cf6", margin: "0 auto 10px", animation: "spin 1s linear infinite" }} />
-                    <div style={{ fontSize: 13, color: "#9ca3af" }}>Buscando tendências gratuitas...</div>
+                  <div style={{ textAlign:"center", padding:"22px 0", color:"#d1d5db" }}>
+                    <div style={{ fontSize:32, marginBottom:8 }}>📡</div>
+                    <div style={{ fontSize:13, color:"#9ca3af" }}>Selecione as fontes e clique em Buscar</div>
+                    <div style={{ fontSize:11, marginTop:4 }}>Sem custo · Sem cadastro</div>
                   </div>
                 )}
 
                 {trends.length > 0 && (
                   <div>
-                    <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 10 }}>Selecione para usar no roteiro:</div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 7, maxHeight: 320, overflowY: "auto" }}>
-                      {trends.map((t, i) => (
-                        <div key={i} onClick={() => toggleTrend(i)} style={{ padding: "10px 12px", borderRadius: 10, border: `2px solid ${selectedTrends.includes(i) ? "#10b981" : "#f3f4f6"}`, background: selectedTrends.includes(i) ? "#f0fdf4" : "#fafafa", cursor: "pointer" }}>
-                          <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                            <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${selectedTrends.includes(i) ? "#10b981" : "#d1d5db"}`, background: selectedTrends.includes(i) ? "#10b981" : "transparent", flexShrink: 0, marginTop: 2, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                              {selectedTrends.includes(i) && <span style={{ color: "#fff", fontSize: 9 }}>✓</span>}
+                    <p style={{ fontSize:12, color:"#9ca3af", marginBottom:10 }}>Selecione para incorporar no roteiro:</p>
+                    <div style={{ display:"flex", flexDirection:"column", gap:7, maxHeight:300, overflowY:"auto" }}>
+                      {trends.map((t,i)=>(
+                        <div key={i} className={`trend-item${selTrends.includes(i)?" selected":""}`} onClick={()=>setSelTrends(p=>p.includes(i)?p.filter(x=>x!==i):[...p,i])}>
+                          <div style={{ display:"flex", gap:8, alignItems:"flex-start" }}>
+                            <div style={{ width:18, height:18, borderRadius:5, border:`2px solid ${selTrends.includes(i)?"#6366f1":"#d1d5db"}`, background:selTrends.includes(i)?"#6366f1":"transparent", flexShrink:0, marginTop:1, display:"flex", alignItems:"center", justifyContent:"center", transition:"all .15s" }}>
+                              {selTrends.includes(i) && <span style={{ color:"#fff", fontSize:10, fontWeight:700 }}>✓</span>}
                             </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: 10, color: "#8b5cf6", ...sy, fontWeight: 700, marginBottom: 2 }}>{t.source}</div>
-                              <div style={{ ...sy, fontWeight: 600, fontSize: 12, color: "#111", lineHeight: 1.3 }}>{t.title}</div>
-                              {t.snippet && <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 2, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{t.snippet}</div>}
+                            <div style={{ flex:1, minWidth:0 }}>
+                              <span style={{ fontSize:10, color:"#6366f1", fontWeight:700 }}>{t.source}</span>
+                              <div style={{ fontWeight:600, fontSize:12, color:"#111", lineHeight:1.35, marginTop:1 }}>{t.title}</div>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
-                    {selectedTrends.length > 0 && <button onClick={() => setSelectedTrends([])} style={{ marginTop: 8, background: "none", border: "none", color: "#9ca3af", fontSize: 12, cursor: "pointer", padding: 0 }}>✕ Limpar seleção</button>}
-                  </div>
-                )}
-
-                {trendsLoaded && trends.length === 0 && (
-                  <div style={{ textAlign: "center", padding: "12px 0", color: "#9ca3af", fontSize: 13 }}>
-                    Nenhuma tendência relevante encontrada agora. Tente novamente.
+                    {selTrends.length > 0 && <button onClick={()=>setSelTrends([])} style={{ marginTop:8, background:"none", border:"none", color:"#9ca3af", fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>✕ Limpar seleção</button>}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Result */}
-            <div style={{ background: result ? "#fff" : "#fafafa", borderRadius: 24, padding: 32, boxShadow: result ? "0 1px 3px rgba(0,0,0,0.05),0 8px 32px rgba(0,0,0,0.04)" : "none", border: result ? "none" : "2px dashed #e5e7eb", minHeight: 420, overflowY: "auto", maxHeight: 780 }}>
+            {/* RIGHT — Result */}
+            <div className={`card fade-up${result?" pop-in":""}`} style={{ padding:32, minHeight:420, overflowY:"auto", maxHeight:780, animationDelay:".08s", background: result?"#fff":"#fafafa", border: result?"1px solid rgba(0,0,0,.06)":"2px dashed #e5e7eb", boxShadow: result?"0 1px 2px rgba(0,0,0,.04),0 4px 24px rgba(0,0,0,.05)":"none" }}>
               {!result && !loading && (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", minHeight: 380, textAlign: "center" }}>
-                  <div style={{ width: 72, height: 72, borderRadius: 22, background: "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18, fontSize: 32 }}>✍️</div>
-                  <div style={{ ...sy, fontWeight: 700, fontSize: 18, color: "#9ca3af" }}>Pronto para criar</div>
-                  <div style={{ fontSize: 13, color: "#d1d5db", marginTop: 6 }}>Configure, busque tendências e clique em Gerar</div>
+                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", minHeight:360, textAlign:"center" }}>
+                  <div style={{ width:72, height:72, borderRadius:24, background:"linear-gradient(135deg,#eef2ff,#f5f3ff)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:18, fontSize:30 }}>✍️</div>
+                  <h3 style={{ fontWeight:700, fontSize:18, color:"#374151" }}>Pronto para criar</h3>
+                  <p style={{ fontSize:13, color:"#9ca3af", marginTop:6 }}>Configure, busque tendências e clique em Gerar</p>
                 </div>
               )}
               {loading && (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", minHeight: 380, textAlign: "center" }}>
-                  <div style={{ width: 56, height: 56, borderRadius: "50%", border: "3px solid #e5e7eb", borderTop: "3px solid #10b981", marginBottom: 20, animation: "spin 1s linear infinite" }} />
-                  <div style={{ ...sy, fontWeight: 700, fontSize: 18, color: "#374151" }}>Criando roteiro único...</div>
-                  <div style={{ fontSize: 13, color: "#9ca3af", marginTop: 6 }}>
-                    {selectedTrends.length > 0 ? `Com ${selectedTrends.length} tendência(s) real(is) incorporada(s)` : `Analisando ${usedThemes.length} temas já usados`}
+                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", minHeight:360, textAlign:"center" }}>
+                  <div style={{ position:"relative", width:64, height:64, marginBottom:24 }}>
+                    <div style={{ position:"absolute", inset:0, borderRadius:"50%", border:"3px solid #eef2ff" }} />
+                    <div style={{ position:"absolute", inset:0, borderRadius:"50%", border:"3px solid transparent", borderTopColor:"#6366f1", animation:"spin 1s linear infinite" }} />
+                    <div style={{ position:"absolute", inset:8, borderRadius:"50%", border:"2px solid transparent", borderTopColor:"#a78bfa", animation:"spin .7s linear infinite reverse" }} />
                   </div>
+                  <h3 style={{ fontWeight:700, fontSize:18, color:"#111" }}>Criando roteiro único...</h3>
+                  <p style={{ fontSize:13, color:"#9ca3af", marginTop:6 }}>
+                    {selTrends.length > 0 ? `Incorporando ${selTrends.length} tendência(s) atual(is)` : `Analisando ${usedThemes.length} temas já usados`}
+                  </p>
                 </div>
               )}
-              {result && !loading && <ResultCard item={result} onCopy={() => copyItem(result, "r")} copied={copied === "r"} sy={sy} dm={dm} />}
+              {result && !loading && <ResultCard item={result} onCopy={()=>copyItem(result,"r")} copied={copied==="r"} />}
             </div>
           </div>
         )}
 
-        {/* HISTÓRICO */}
+        {/* ══ HISTÓRICO ══ */}
         {tab === "historico" && (
-          <div>
-            <div style={{ marginBottom: 28 }}>
-              <h2 style={{ ...sy, fontWeight: 800, fontSize: 26, color: "#111", margin: 0 }}>Roteiros Gerados</h2>
-              <p style={{ color: "#9ca3af", fontSize: 14, margin: "4px 0 0" }}>{generated.length} roteiro{generated.length !== 1 ? "s" : ""} no histórico</p>
+          <div className="fade-in">
+            <div style={{ marginBottom:28 }}>
+              <h2 style={{ fontWeight:800, fontSize:26, color:"#111", letterSpacing:"-0.5px" }}>Roteiros Gerados</h2>
+              <p style={{ color:"#9ca3af", fontSize:14, marginTop:4 }}>{generated.length} roteiro{generated.length!==1?"s":""} no histórico</p>
             </div>
             {generated.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "80px 0" }}>
-                <div style={{ fontSize: 48, marginBottom: 16 }}>📂</div>
-                <div style={{ ...sy, fontWeight: 700, fontSize: 18, color: "#9ca3af" }}>Histórico vazio</div>
+              <div style={{ textAlign:"center", padding:"80px 0" }}>
+                <div style={{ fontSize:52, marginBottom:16 }}>📂</div>
+                <h3 style={{ fontWeight:700, fontSize:18, color:"#9ca3af" }}>Histórico vazio</h3>
+                <p style={{ fontSize:14, color:"#d1d5db", marginTop:6 }}>Gere seu primeiro roteiro na aba Gerar</p>
               </div>
-            ) : generated.map((item, i) => (
-              <div key={i} style={{ background: "#fff", borderRadius: 20, padding: "22px 26px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", marginBottom: 12 }}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <span style={{ color: "#fff", ...sy, fontWeight: 800, fontSize: 13 }}>{item.day}</span>
-                    </div>
-                    <div>
-                      <div style={{ ...sy, fontWeight: 700, fontSize: 15, color: "#111" }}>{item.tema}</div>
-                      <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
-                        <span style={{ fontSize: 10, color: FORMAT_COLORS[item.fmt], background: FORMAT_BG[item.fmt], padding: "2px 7px", borderRadius: 6, ...sy, fontWeight: 700 }}>{item.fmt}</span>
-                        {item.trendBased && <span style={{ fontSize: 10, color: "#8b5cf6", background: "#f5f3ff", padding: "2px 7px", borderRadius: 6, ...sy, fontWeight: 700 }}>📡 Trend</span>}
-                        <span style={{ fontSize: 11, color: "#9ca3af" }}>{item.date}</span>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                {generated.map((item,i)=>(
+                  <div key={i} className="card fade-up" style={{ padding:"22px 26px", animationDelay:`${i*.04}s` }}>
+                    <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:12 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                        <div style={{ width:44, height:44, borderRadius:13, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, boxShadow:"0 4px 12px rgba(99,102,241,.25)" }}>
+                          <span style={{ color:"#fff", fontWeight:800, fontSize:13 }}>{item.day}</span>
+                        </div>
+                        <div>
+                          <div style={{ fontWeight:700, fontSize:15, color:"#111" }}>{item.tema}</div>
+                          <div style={{ display:"flex", gap:6, marginTop:5 }}>
+                            <span style={{ fontSize:10, color:FMT[item.fmt]?.color||"#6b7280", background:FMT[item.fmt]?.bg||"#f3f4f6", padding:"2px 8px", borderRadius:6, fontWeight:700 }}>{item.fmt}</span>
+                            {item.trendBased && <span style={{ fontSize:10, color:"#7c3aed", background:"#f5f3ff", padding:"2px 8px", borderRadius:6, fontWeight:700 }}>📡 Trend</span>}
+                            <span style={{ fontSize:11, color:"#9ca3af" }}>{item.date}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display:"flex", gap:8, flexShrink:0 }}>
+                        <button className={`copy-btn${copied===`h${i}`?" copied":""}`} onClick={()=>copyItem(item,`h${i}`)}>{copied===`h${i}`?"✓ Copiado":"Copiar"}</button>
+                        <button onClick={()=>delGen(i)} style={{ background:"none", border:"none", color:"#d1d5db", fontSize:20, cursor:"pointer", lineHeight:1, padding:"0 4px" }}>×</button>
                       </div>
                     </div>
+                    <p style={{ color:"#f97316", fontSize:13, fontStyle:"italic", marginBottom:10 }}>"{item.gancho}"</p>
+                    <button onClick={()=>setExpanded(expanded===i?null:i)} style={{ background:"none", border:"none", color:"#6366f1", fontFamily:"inherit", fontWeight:700, fontSize:12, cursor:"pointer", padding:0 }}>
+                      {expanded===i?"▾ Fechar roteiro":"▸ Ver roteiro completo"}
+                    </button>
+                    {expanded===i && (
+                      <div className="fade-up" style={{ marginTop:16, paddingTop:16, borderTop:"1px solid #f3f4f6" }}>
+                        <ResultCard item={item} onCopy={()=>copyItem(item,`he${i}`)} copied={copied===`he${i}`} compact />
+                      </div>
+                    )}
                   </div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button onClick={() => copyItem(item, `h${i}`)} style={{ padding: "6px 12px", borderRadius: 8, border: `1px solid ${copied === `h${i}` ? "#10b981" : "#e5e7eb"}`, background: copied === `h${i}` ? "#f0fdf4" : "#fff", color: copied === `h${i}` ? "#10b981" : "#6b7280", ...sy, fontWeight: 700, fontSize: 11, cursor: "pointer" }}>{copied === `h${i}` ? "✓" : "Copiar"}</button>
-                    <button onClick={() => delGenerated(i)} style={{ background: "none", border: "none", color: "#d1d5db", fontSize: 18, cursor: "pointer" }}>×</button>
-                  </div>
-                </div>
-                <div style={{ color: "#f97316", fontSize: 13, fontStyle: "italic", marginBottom: 8 }}>"{item.gancho}"</div>
-                <button onClick={() => setExpanded(expanded === i ? null : i)} style={{ background: "none", border: "none", color: "#10b981", ...sy, fontWeight: 700, fontSize: 12, cursor: "pointer", padding: 0 }}>
-                  {expanded === i ? "▾ Fechar" : "▸ Ver roteiro completo"}
-                </button>
-                {expanded === i && (
-                  <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid #f3f4f6" }}>
-                    <ResultCard item={item} onCopy={() => copyItem(item, `he${i}`)} copied={copied === `he${i}`} sy={sy} dm={dm} compact />
-                  </div>
-                )}
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
 
-        {/* PLANNER */}
+        {/* ══ PLANNER ══ */}
         {tab === "planner" && (
-          <div>
-            <div style={{ marginBottom: 28 }}>
-              <h2 style={{ ...sy, fontWeight: 800, fontSize: 26, color: "#111", margin: 0 }}>Planner 30 Dias</h2>
-              <p style={{ color: "#9ca3af", fontSize: 14, margin: "4px 0 0" }}>Clique em qualquer dia para ver o roteiro completo</p>
+          <div className="fade-in">
+            <div style={{ marginBottom:28 }}>
+              <h2 style={{ fontWeight:800, fontSize:26, color:"#111", letterSpacing:"-0.5px" }}>Planner 30 Dias</h2>
+              <p style={{ color:"#9ca3af", fontSize:14, marginTop:4 }}>Clique em qualquer dia para ver o roteiro completo</p>
             </div>
-            {PLANNER.map(item => (
-              <div key={item.day} style={{ background: "#fff", borderRadius: 16, overflow: "hidden", marginBottom: 8, border: `2px solid ${plannerOpen === item.day ? FORMAT_COLORS[item.format] : "transparent"}`, transition: "border 0.2s" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 18px", cursor: "pointer" }} onClick={() => setPlannerOpen(plannerOpen === item.day ? null : item.day)}>
-                  <div style={{ width: 34, height: 34, borderRadius: 9, background: plannerOpen === item.day ? FORMAT_COLORS[item.format] : "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <span style={{ ...sy, fontWeight: 800, fontSize: 12, color: plannerOpen === item.day ? "#fff" : "#9ca3af" }}>{item.day}</span>
-                  </div>
-                  <span style={{ fontSize: 10, color: FORMAT_COLORS[item.format], background: FORMAT_BG[item.format], padding: "3px 9px", borderRadius: 7, ...sy, fontWeight: 700, flexShrink: 0 }}>{item.format}</span>
-                  <span style={{ ...sy, fontWeight: 600, fontSize: 14, color: "#111", flex: 1 }}>{item.tema}</span>
-                  <span style={{ color: plannerOpen === item.day ? FORMAT_COLORS[item.format] : "#d1d5db", fontSize: 16 }}>{plannerOpen === item.day ? "▾" : "▸"}</span>
-                </div>
-                {plannerOpen === item.day && (
-                  <div style={{ padding: "0 18px 22px", borderTop: "1px solid #f9fafb" }}>
-                    <div style={{ paddingTop: 18, display: "flex", justifyContent: "flex-end", marginBottom: 14 }}>
-                      <button onClick={() => copyItem(item, `p${item.day}`)} style={{ padding: "7px 16px", borderRadius: 9, border: `1px solid ${copied === `p${item.day}` ? "#10b981" : "#e5e7eb"}`, background: copied === `p${item.day}` ? "#f0fdf4" : "#fff", color: copied === `p${item.day}` ? "#10b981" : "#6b7280", ...sy, fontWeight: 700, fontSize: 12, cursor: "pointer" }}>
-                        {copied === `p${item.day}` ? "✓ Copiado!" : "Copiar Roteiro"}
-                      </button>
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              {PLANNER.map((item,i)=>(
+                <div key={item.day} className="planner-row fade-up" style={{ animationDelay:`${i*.02}s`, borderColor: plannerOpen===item.day ? FMT[item.format]?.color : "transparent" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:14, padding:"13px 18px", cursor:"pointer" }} onClick={()=>setPlannerOpen(plannerOpen===item.day?null:item.day)}>
+                    <div style={{ width:34, height:34, borderRadius:9, background: plannerOpen===item.day ? `linear-gradient(135deg,${FMT[item.format]?.color},${FMT[item.format]?.dot})` : "#f5f5f7", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, transition:"all .2s" }}>
+                      <span style={{ fontWeight:800, fontSize:12, color: plannerOpen===item.day?"#fff":"#9ca3af" }}>{item.day}</span>
                     </div>
-                    <ResultCard item={item} onCopy={() => copyItem(item, `pp${item.day}`)} copied={copied === `pp${item.day}`} sy={sy} dm={dm} compact />
+                    <span style={{ fontSize:10, color:FMT[item.format]?.color, background:FMT[item.format]?.bg, padding:"3px 9px", borderRadius:7, fontWeight:700, flexShrink:0 }}>{item.format}</span>
+                    <span style={{ fontWeight:600, fontSize:14, color:"#111", flex:1 }}>{item.tema}</span>
+                    <span style={{ fontSize:11, color:"#9ca3af", flexShrink:0, display:"none" }}>{item.gatilho}</span>
+                    <span style={{ color: plannerOpen===item.day ? FMT[item.format]?.color : "#d1d5db", fontSize:16, flexShrink:0, transition:"transform .2s", transform: plannerOpen===item.day?"rotate(0deg)":"rotate(0deg)" }}>
+                      {plannerOpen===item.day?"▾":"▸"}
+                    </span>
                   </div>
-                )}
-              </div>
-            ))}
+                  {plannerOpen===item.day && (
+                    <div className="fade-up" style={{ padding:"0 18px 22px", borderTop:"1px solid #f9fafb" }}>
+                      <div style={{ paddingTop:18, display:"flex", justifyContent:"flex-end", marginBottom:14 }}>
+                        <button className={`copy-btn${copied===`p${item.day}`?" copied":""}`} onClick={()=>copyItem(item,`p${item.day}`)}>
+                          {copied===`p${item.day}`?"✓ Copiado!":"Copiar Roteiro"}
+                        </button>
+                      </div>
+                      <ResultCard item={item} onCopy={()=>copyItem(item,`pp${item.day}`)} copied={copied===`pp${item.day}`} compact />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </main>
-      <style>{`@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}*{box-sizing:border-box}select{appearance:none}`}</style>
     </div>
   );
 }
 
-const sel = (dm) => ({ width: "100%", padding: "11px 14px", borderRadius: 12, border: "2px solid #e5e7eb", background: "#fafafa", color: "#374151", ...dm, fontSize: 14, outline: "none", cursor: "pointer", marginBottom: 18 });
-function Lbl({ children, sy }) { return <div style={{ ...sy, fontWeight: 600, fontSize: 11, color: "#6b7280", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>{children}</div>; }
+// ── SUBCOMPONENTS ─────────────────────────────────────────────────────────
+function Label({ children }) {
+  return <div style={{ fontWeight:600, fontSize:11, color:"#6b7280", letterSpacing:"0.8px", textTransform:"uppercase", marginBottom:8 }}>{children}</div>;
+}
 
-function ResultCard({ item, onCopy, copied, sy, dm, compact }) {
+function ResultCard({ item, onCopy, copied, compact }) {
   const fk = item.fmt || item.format;
   return (
     <div>
       {!compact && (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid #f3f4f6" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: "#fff", ...sy, fontWeight: 800, fontSize: 13 }}>{item.day}</span>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:22, paddingBottom:18, borderBottom:"1px solid #f3f4f6" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <div style={{ width:44, height:44, borderRadius:13, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 12px rgba(99,102,241,.25)" }}>
+              <span style={{ color:"#fff", fontWeight:800, fontSize:14 }}>{item.day}</span>
             </div>
             <div>
-              <span style={{ fontSize: 11, color: FORMAT_COLORS[fk] || "#6b7280", background: FORMAT_BG[fk] || "#f3f4f6", padding: "2px 8px", borderRadius: 6, ...sy, fontWeight: 700 }}>{fk}</span>
-              {item.trendBased && <span style={{ fontSize: 11, color: "#8b5cf6", background: "#f5f3ff", padding: "2px 8px", borderRadius: 6, ...sy, fontWeight: 700, marginLeft: 6 }}>📡 Trend</span>}
+              <span style={{ fontSize:10, color:FMT[fk]?.color||"#6b7280", background:FMT[fk]?.bg||"#f3f4f6", padding:"2px 8px", borderRadius:6, fontWeight:700 }}>{fk}</span>
+              {item.trendBased && <span style={{ fontSize:10, color:"#7c3aed", background:"#f5f3ff", padding:"2px 8px", borderRadius:6, fontWeight:700, marginLeft:6 }}>📡 Trend</span>}
+              {item.pilar && <span style={{ fontSize:11, color:"#9ca3af", marginLeft:8 }}>{item.pilar}</span>}
             </div>
           </div>
-          <button onClick={onCopy} style={{ padding: "8px 18px", borderRadius: 10, border: `1px solid ${copied ? "#10b981" : "#e5e7eb"}`, background: copied ? "#f0fdf4" : "#fff", color: copied ? "#10b981" : "#6b7280", ...sy, fontWeight: 700, fontSize: 12, cursor: "pointer" }}>
-            {copied ? "✓ Copiado!" : "Copiar Tudo"}
-          </button>
+          <button className={`copy-btn${copied?" copied":""}`} onClick={onCopy}>{copied?"✓ Copiado!":"Copiar Tudo"}</button>
         </div>
       )}
-      <div style={{ ...sy, fontWeight: 800, fontSize: compact ? 15 : 21, color: "#111", lineHeight: 1.3, marginBottom: 14 }}>{item.tema}</div>
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ ...sy, fontWeight: 700, fontSize: 10, color: "#9ca3af", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>🪝 Gancho</div>
-        <div style={{ fontSize: 14, color: "#374151", fontStyle: "italic", lineHeight: 1.6 }}>"{item.gancho}"</div>
+
+      <h3 style={{ fontWeight:800, fontSize:compact?16:22, color:"#111", letterSpacing:"-0.3px", lineHeight:1.3, marginBottom:14 }}>{item.tema}</h3>
+
+      {/* Gancho */}
+      <div style={{ marginBottom:16 }}>
+        <Label>🪝 Gancho</Label>
+        <p style={{ fontSize:14, color:"#374151", fontStyle:"italic", lineHeight:1.65, borderLeft:"3px solid #6366f1", paddingLeft:12 }}>"{item.gancho}"</p>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
-        <div style={{ background: "#fef3c7", borderRadius: 11, padding: "11px 13px" }}><div style={{ ...sy, fontWeight: 700, fontSize: 10, color: "#92400e", letterSpacing: 1, textTransform: "uppercase", marginBottom: 3 }}>⚡ Gatilho</div><div style={{ fontSize: 13, color: "#78350f" }}>{item.gatilho}</div></div>
-        <div style={{ background: "#ede9fe", borderRadius: 11, padding: "11px 13px" }}><div style={{ ...sy, fontWeight: 700, fontSize: 10, color: "#5b21b6", letterSpacing: 1, textTransform: "uppercase", marginBottom: 3 }}>📌 Pilar</div><div style={{ fontSize: 13, color: "#4c1d95" }}>{item.pilar}</div></div>
-      </div>
-      {[["🎬 Roteiro", item.roteiro, true], ["📝 Legenda", item.legenda, true]].map(([label, val, pre]) => (
-        <div key={label} style={{ marginBottom: 16 }}>
-          <div style={{ ...sy, fontWeight: 700, fontSize: 10, color: "#9ca3af", letterSpacing: 1, textTransform: "uppercase", marginBottom: 7 }}>{label}</div>
-          <div style={{ fontSize: 13, color: "#374151", whiteSpace: pre ? "pre-wrap" : "normal", lineHeight: 1.8, background: label.includes("Roteiro") ? "#fafafa" : "transparent", padding: label.includes("Roteiro") ? 14 : 0, borderRadius: label.includes("Roteiro") ? 11 : 0 }}>{val}</div>
+
+      {/* Pills */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:18 }}>
+        <div style={{ background:"linear-gradient(135deg,#fef9c3,#fef3c7)", borderRadius:12, padding:"11px 14px", border:"1px solid #fde68a" }}>
+          <Label>⚡ Gatilho</Label>
+          <p style={{ fontSize:13, color:"#92400e", fontWeight:600 }}>{item.gatilho}</p>
         </div>
-      ))}
-      <div style={{ background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: 13, padding: "13px 16px", border: "1px solid #bbf7d0" }}>
-        <div style={{ ...sy, fontWeight: 700, fontSize: 10, color: "#166534", letterSpacing: 1, textTransform: "uppercase", marginBottom: 5 }}>📣 CTA</div>
-        <div style={{ fontWeight: 600, fontSize: 14, color: "#14532d" }}>{item.cta}</div>
+        <div style={{ background:"linear-gradient(135deg,#ede9fe,#f5f3ff)", borderRadius:12, padding:"11px 14px", border:"1px solid #ddd6fe" }}>
+          <Label>📌 Pilar</Label>
+          <p style={{ fontSize:13, color:"#5b21b6", fontWeight:600 }}>{item.pilar}</p>
+        </div>
+      </div>
+
+      {/* Roteiro */}
+      <div style={{ marginBottom:16 }}>
+        <Label>🎬 Roteiro</Label>
+        <div style={{ background:"#fafafa", border:"1px solid #f3f4f6", borderRadius:14, padding:16 }}>
+          <p style={{ fontSize:13, color:"#374151", whiteSpace:"pre-wrap", lineHeight:1.85 }}>{item.roteiro}</p>
+        </div>
+      </div>
+
+      {/* Legenda */}
+      <div style={{ marginBottom:16 }}>
+        <Label>📝 Legenda</Label>
+        <p style={{ fontSize:13, color:"#374151", whiteSpace:"pre-wrap", lineHeight:1.85 }}>{item.legenda}</p>
+      </div>
+
+      {/* CTA */}
+      <div style={{ background:"linear-gradient(135deg,#eef2ff,#f5f3ff)", borderRadius:14, padding:"14px 18px", border:"1px solid #c7d2fe" }}>
+        <Label>📣 CTA</Label>
+        <p style={{ fontWeight:700, fontSize:14, color:"#3730a3" }}>{item.cta}</p>
       </div>
     </div>
   );
