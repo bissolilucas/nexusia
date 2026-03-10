@@ -38,11 +38,56 @@ const PILLARS = ["Autoridade em IA", "Educação do mercado", "Prova social", "B
 const TRIGGERS = ["Curiosidade", "Medo de ficar para trás", "Dor financeira", "Prova social", "Quebra de crença", "Choque", "Oportunidade", "Transformação", "Visão de futuro", "Autoridade", "Resultado", "Diagnóstico", "Analogia simples"];
 const FMT = { "REELS": { color: "#f97316", bg: "#fff7ed" }, "CARROSSEL": { color: "#7c3aed", bg: "#f5f3ff" }, "POST FEED": { color: "#0891b2", bg: "#ecfeff" } };
 
+const parseRSS = (xml, source) => {
+  const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)];
+  return items.slice(0, 10).map((m, i) => {
+    const title = m[1].match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] || m[1].match(/<title>(.*?)<\/title>/)?.[1] || "";
+    const snippet = m[1].match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)?.[1]?.replace(/<[^>]+>/g, "").slice(0, 120) || "";
+    return { source, title: title.replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'"), snippet, score: 100 - i };
+  });
+};
+
 const FREE_SOURCES = [
-  { id: "reddit_ai", label: "r/artificial", emoji: "🤖", url: "https://www.reddit.com/r/artificial/hot.json?limit=15", parse: d => d.data.children.map(p => ({ source: "Reddit AI", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
-  { id: "reddit_chatgpt", label: "r/ChatGPT", emoji: "💬", url: "https://www.reddit.com/r/ChatGPT/hot.json?limit=15", parse: d => d.data.children.map(p => ({ source: "Reddit ChatGPT", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
-  { id: "reddit_auto", label: "r/automation", emoji: "⚙️", url: "https://www.reddit.com/r/automation/hot.json?limit=15", parse: d => d.data.children.map(p => ({ source: "Reddit Automation", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
-  { id: "devto", label: "Dev.to AI", emoji: "📝", url: "https://dev.to/api/articles?tag=ai&per_page=10&top=7", parse: d => d.map(a => ({ source: "Dev.to", title: a.title, snippet: a.description||"", score: a.positive_reactions_count })) },
+  {
+    id: "instagram",
+    label: "Instagram",
+    emoji: "📸",
+    url: "https://news.google.com/rss/search?q=tendencias+instagram+brasil+2025&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+    parseRSS: true,
+    source: "Instagram Trends"
+  },
+  {
+    id: "tiktok",
+    label: "TikTok",
+    emoji: "🎵",
+    url: "https://news.google.com/rss/search?q=tendencias+tiktok+brasil+viral+2025&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+    parseRSS: true,
+    source: "TikTok Trends"
+  },
+  {
+    id: "youtube",
+    label: "YouTube",
+    emoji: "▶️",
+    url: "https://news.google.com/rss/search?q=tendencias+youtube+brasil+viral+2025&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+    parseRSS: true,
+    source: "YouTube Trends"
+  },
+  {
+    id: "ia_br",
+    label: "IA no Brasil",
+    emoji: "🤖",
+    url: "https://news.google.com/rss/search?q=inteligencia+artificial+automacao+empresas+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419",
+    parseRSS: true,
+    source: "IA & Automação BR"
+  },
+  {
+    id: "devto",
+    label: "Dev.to",
+    emoji: "📝",
+    url: "https://dev.to/api/articles?tag=ai&per_page=10&top=7",
+    parseRSS: false,
+    parse: d => d.map(a => ({ source: "Dev.to", title: a.title, snippet: a.description||"", score: a.positive_reactions_count }))
+  },
 ];
 
 async function store(k, v) { try { await window.storage.set(k, JSON.stringify(v)); } catch {} }
@@ -97,7 +142,7 @@ export default function App() {
   const [selTrends, setSelTrends] = useState([]);
   const [loadingTrends, setLoadingTrends] = useState(false);
   const [trendsLoaded, setTrendsLoaded] = useState(false);
-  const [activeSrc, setActiveSrc] = useState(["reddit_ai", "reddit_chatgpt"]);
+  const [activeSrc, setActiveSrc] = useState(["instagram", "tiktok", "youtube"]);
 const [provider, setProvider] = useState("claude");
 
   useEffect(() => {
@@ -115,11 +160,9 @@ const [provider, setProvider] = useState("claude");
     const all = [];
     for (const src of FREE_SOURCES.filter(s => activeSrc.includes(s.id))) {
       try {
-        if (src.id === "hn") {
-          const ids = await fetch(src.url).then(r => r.json());
-          const top = Array.isArray(ids) ? ids.slice(0, 12) : Object.values(ids).slice(0, 12);
-          const items = await Promise.all(top.map(id => fetch(`https://hacker-news.firebaseio.com/v2/item/${id}.json`).then(r => r.json())));
-          items.filter(i => i && i.title).forEach(i => all.push({ source: "HN", title: i.title, snippet: i.url || "", score: i.score || 0 }));
+        if (src.parseRSS) {
+          const xml = await fetch(src.url).then(r => r.text());
+          parseRSS(xml, src.source).forEach(i => all.push(i));
         } else {
           src.parse(await fetch(src.url).then(r => r.json())).forEach(i => all.push(i));
         }
