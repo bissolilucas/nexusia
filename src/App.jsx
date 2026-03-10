@@ -163,15 +163,27 @@ const [provider, setProvider] = useState("claude");
     const tCtx = selTrends.length
       ? `\n\nTENDÊNCIAS EM ALTA INTERNACIONAIS (use como inspiração e adapte para o contexto brasileiro de automação e IA):\n${selTrends.map(i => `- ${trends[i].title}`).join("\n")}`
       : "";
-    const prompt = `Especialista em marketing digital de IA/Automação para empresas brasileiras.
-Crie roteiro COMPLETO (~60s) para Lucas Bissoli da NexusIA.
-FORMATO:${fmt} | PILAR:${pilar} | GATILHO:${gatilho}
-${temaInput ? `TEMA SUGERIDO:${temaInput}` : ""}${tCtx}
-TEMAS USADOS — NÃO REPETIR:
-${usedThemes.map((t, i) => `${i + 1}.${t}`).join("\n")}
-Linguagem direta, brasileira. ${fmt === "REELS" ? "~130-150 palavras narradas." : fmt === "CARROSSEL" ? "Slides numerados com conteúdo." : "Texto imagem + legenda."}
-JSON somente sem markdown: {"tema":"...","gancho":"...","gatilho":"${gatilho}","pilar":"${pilar}","roteiro":"...","legenda":"...","cta":"..."}`;
+    const prompt = `Você é o melhor copywriter de marketing digital do Brasil, especialista em IA e automação para empresas.
+Crie um roteiro COMPLETO e CRIATIVO para Lucas Bissoli da NexusIA. O conteúdo deve ser irresistível, provocador e gerar engajamento imediato.
 
+FORMATO: ${fmt}
+PILAR: ${pilar}
+GATILHO EMOCIONAL: ${gatilho}
+${temaInput ? `TEMA: ${temaInput}` : ""}${tCtx}
+
+REGRAS OBRIGATÓRIAS:
+- Gancho nos primeiros 3 segundos — deve parar o scroll imediatamente
+- Use storytelling, dados reais, analogias poderosas ou provocações
+- Linguagem natural, brasileira, como se estivesse conversando
+- Nunca seja genérico — seja específico, surpreendente e memorável
+- Terminar com CTA direto e irresistível
+${fmt === "REELS" ? "- Roteiro narrado em voz: mínimo 150 palavras, máximo 180. Ritmo dinâmico, frases curtas e impactantes. Use pausas dramáticas com '...' e perguntas retóricas." : fmt === "CARROSSEL" ? "- Mínimo 7 slides. Cada slide com título impactante + 2-3 linhas de conteúdo rico. Progressão lógica que prende até o final." : "- Texto principal da imagem (máximo 10 palavras impactantes) + legenda completa e envolvente com mínimo 5 linhas."}
+
+TEMAS JÁ USADOS — CRIE ALGO COMPLETAMENTE DIFERENTE:
+${usedThemes.map((t, i) => `${i + 1}. ${t}`).join("\n")}
+
+Responda SOMENTE JSON válido sem markdown:
+{"tema":"...","gancho":"...","gatilho":"${gatilho}","pilar":"${pilar}","roteiro":"...","legenda":"...","cta":"..."}`;
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
