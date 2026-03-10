@@ -206,7 +206,11 @@ export default function App() {
     }
     const kw = ["ai","artificial","automat","chatgpt","llm","gpt","bot","workflow","crm","whatsapp","ia "];
     const filtered = all.filter(t => kw.some(k => (t.title+" "+t.snippet).toLowerCase().includes(k)));
-    setTrends((filtered.length > 3 ? filtered : all).sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,20));
+    const final = (filtered.length > 3 ? filtered : all)
+  .sort((a,b)=>(b.score||0)-(a.score||0))
+  .slice(0,20)
+  .map(t => ({ ...t, title: t.title, _original: t.title }));
+setTrends(final);.sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,20));
     setTrendsLoaded(true); setLoadingTrends(false);
   };
 
