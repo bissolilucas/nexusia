@@ -39,11 +39,10 @@ const TRIGGERS = ["Curiosidade", "Medo de ficar para trás", "Dor financeira", "
 const FMT = { "REELS": { color: "#f97316", bg: "#fff7ed" }, "CARROSSEL": { color: "#7c3aed", bg: "#f5f3ff" }, "POST FEED": { color: "#0891b2", bg: "#ecfeff" } };
 
 const FREE_SOURCES = [
-  { id: "reddit_br", label: "r/brdev", emoji: "🇧🇷", url: "https://www.reddit.com/r/brdev/hot.json?limit=10", parse: d => d.data.children.map(p => ({ source: "Reddit BR", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
-  { id: "reddit_empreend", label: "r/empreendedorismo", emoji: "💼", url: "https://www.reddit.com/r/empreendedorismo/hot.json?limit=10", parse: d => d.data.children.map(p => ({ source: "Reddit BR", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
-  { id: "reddit_ai", label: "r/artificial", emoji: "🤖", url: "https://www.reddit.com/r/artificial/hot.json?limit=10", parse: d => d.data.children.map(p => ({ source: "Reddit AI", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
+  { id: "reddit_ai", label: "r/artificial", emoji: "🤖", url: "https://www.reddit.com/r/artificial/hot.json?limit=15", parse: d => d.data.children.map(p => ({ source: "Reddit AI", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
+  { id: "reddit_chatgpt", label: "r/ChatGPT", emoji: "💬", url: "https://www.reddit.com/r/ChatGPT/hot.json?limit=15", parse: d => d.data.children.map(p => ({ source: "Reddit ChatGPT", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
+  { id: "reddit_auto", label: "r/automation", emoji: "⚙️", url: "https://www.reddit.com/r/automation/hot.json?limit=15", parse: d => d.data.children.map(p => ({ source: "Reddit Automation", title: p.data.title, snippet: p.data.selftext?.slice(0,100)||"", score: p.data.score })) },
   { id: "devto", label: "Dev.to AI", emoji: "📝", url: "https://dev.to/api/articles?tag=ai&per_page=10&top=7", parse: d => d.map(a => ({ source: "Dev.to", title: a.title, snippet: a.description||"", score: a.positive_reactions_count })) },
-  { id: "hn", label: "Hacker News", emoji: "🔶", url: "https://hacker-news.firebaseio.com/v2/topstories.json?limitToFirst=20&orderBy=%22$key%22", parse: null },
 ];
 
 async function store(k, v) { try { await window.storage.set(k, JSON.stringify(v)); } catch {} }
@@ -98,7 +97,8 @@ export default function App() {
   const [selTrends, setSelTrends] = useState([]);
   const [loadingTrends, setLoadingTrends] = useState(false);
   const [trendsLoaded, setTrendsLoaded] = useState(false);
-  const [activeSrc, setActiveSrc] = useState(["reddit_br", "reddit_empreend"]);
+  const [activeSrc, setActiveSrc] = useState(["reddit_ai", "reddit_chatgpt"]);
+const [provider, setProvider] = useState("claude");
 
   useEffect(() => {
     load("nexusia_v7", []).then(setGenerated);
@@ -125,10 +125,27 @@ export default function App() {
         }
       } catch {}
     }
-    const kw = ["ai", "artificial", "automat", "chatgpt", "llm", "gpt", "bot", "workflow", "crm", "whatsapp", "ia "];
+    const kw = ["ai", "artificial", "automat", "chatgpt", "llm", "gpt", "bot", "workflow", "crm", "whatsapp"];
     const filtered = all.filter(t => kw.some(k => (t.title + " " + t.snippet).toLowerCase().includes(k)));
-    const final = (filtered.length > 3 ? filtered : all).sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 20);
-    setTrends(final);
+    const top = (filtered.length > 3 ? filtered : all).sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 15);
+
+    // Traduz títulos para PT-BR
+    try {
+      const translatePrompt = `Traduza os títulos abaixo para português brasileiro de forma natural e direta. Retorne SOMENTE um array JSON com os títulos traduzidos na mesma ordem, sem explicações:\n${JSON.stringify(top.map(t => t.title))}`;
+      const tRes = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: "claude", model: "claude-sonnet-4-20250514", max_tokens: 1000, messages: [{ role: "user", content: translatePrompt }] }),
+      });
+      const tData = await tRes.json();
+      const tText = tData.content?.map(b => b.text || "").join("") || "";
+      const translated = JSON.parse(tText.replace(/```json|```/g, "").trim());
+      const final = top.map((t, i) => ({ ...t, title: translated[i] || t.title }));
+      setTrends(final);
+    } catch {
+      setTrends(top);
+    }
+
     setTrendsLoaded(true);
     setLoadingTrends(false);
   };
@@ -151,7 +168,7 @@ JSON somente sem markdown: {"tema":"...","gancho":"...","gatilho":"${gatilho}","
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1200, messages: [{ role: "user", content: prompt }] }),
+        body: JSON.stringify({ provider, model: "claude-sonnet-4-20250514", max_tokens: 1200, messages: [{ role: "user", content: prompt }] }),
       });
       const data = await res.json();
 
@@ -253,6 +270,12 @@ const parsed = JSON.parse(jsonMatch[0]);
                     <span style={{ fontSize: 13, color: "#166534", fontWeight: 600 }}>{selTrends.length} tendência{selTrends.length > 1 ? "s" : ""} incorporada{selTrends.length > 1 ? "s" : ""}</span>
                   </div>
                 )}
+                <Label>Modelo de IA</Label>
+                <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+                {[["claude", "Claude (Anthropic)"], ["openai", "ChatGPT (OpenAI)"]].map(([id, label]) => (
+                <button key={id} onClick={() => setProvider(id)} style={{ flex: 1, padding: "9px 0", borderRadius: 11, border: `2px solid ${provider === id ? "#6366f1" : "#e5e7eb"}`, background: provider === id ? "#eef2ff" : "#fafafa", color: provider === id ? "#6366f1" : "#9ca3af", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 11, cursor: "pointer", transition: "all .15s" }}>{label}</button>
+                 ))}
+               </div>
                 <button className="btn-primary" onClick={generate} disabled={loading}>
                   {loading
                     ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
