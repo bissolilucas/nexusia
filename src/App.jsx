@@ -48,46 +48,11 @@ const parseRSS = (xml, source) => {
 };
 
 const FREE_SOURCES = [
-  {
-    id: "instagram",
-    label: "Instagram",
-    emoji: "📸",
-    url: "https://news.google.com/rss/search?q=tendencias+instagram+brasil+2025&hl=pt-BR&gl=BR&ceid=BR:pt-419",
-    parseRSS: true,
-    source: "Instagram Trends"
-  },
-  {
-    id: "tiktok",
-    label: "TikTok",
-    emoji: "🎵",
-    url: "https://news.google.com/rss/search?q=tendencias+tiktok+brasil+viral+2025&hl=pt-BR&gl=BR&ceid=BR:pt-419",
-    parseRSS: true,
-    source: "TikTok Trends"
-  },
-  {
-    id: "youtube",
-    label: "YouTube",
-    emoji: "▶️",
-    url: "https://news.google.com/rss/search?q=tendencias+youtube+brasil+viral+2025&hl=pt-BR&gl=BR&ceid=BR:pt-419",
-    parseRSS: true,
-    source: "YouTube Trends"
-  },
-  {
-    id: "ia_br",
-    label: "IA no Brasil",
-    emoji: "🤖",
-    url: "https://news.google.com/rss/search?q=inteligencia+artificial+automacao+empresas+brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419",
-    parseRSS: true,
-    source: "IA & Automação BR"
-  },
-  {
-    id: "devto",
-    label: "Dev.to",
-    emoji: "📝",
-    url: "https://dev.to/api/articles?tag=ai&per_page=10&top=7",
-    parseRSS: false,
-    parse: d => d.map(a => ({ source: "Dev.to", title: a.title, snippet: a.description||"", score: a.positive_reactions_count }))
-  },
+  { id: "instagram", label: "Instagram",    emoji: "📸" },
+  { id: "tiktok",    label: "TikTok",       emoji: "🎵" },
+  { id: "youtube",   label: "YouTube",      emoji: "▶️" },
+  { id: "ia_br",     label: "IA no Brasil", emoji: "🤖" },
+  { id: "devto",     label: "Dev.to",       emoji: "📝", url: "https://dev.to/api/articles?tag=ai&per_page=10&top=7", parse: d => d.map(a => ({ source: "Dev.to", title: a.title, snippet: a.description||"", score: a.positive_reactions_count })) },
 ];
 
 async function store(k, v) { try { await window.storage.set(k, JSON.stringify(v)); } catch {} }
@@ -158,13 +123,13 @@ const [provider, setProvider] = useState("claude");
   const fetchTrends = async () => {
     setLoadingTrends(true); setTrends([]); setSelTrends([]); setTrendsLoaded(false);
     const all = [];
-    for (const src of FREE_SOURCES.filter(s => activeSrc.includes(s.id))) {
+   for (const src of FREE_SOURCES.filter(s => activeSrc.includes(s.id))) {
       try {
-        if (src.parseRSS) {
-          const xml = await fetch(src.url).then(r => r.text());
-          parseRSS(xml, src.source).forEach(i => all.push(i));
-        } else {
+        if (src.url && src.parse) {
           src.parse(await fetch(src.url).then(r => r.json())).forEach(i => all.push(i));
+        } else {
+          const data = await fetch(`/api/trends?source=${src.id}`).then(r => r.json());
+          (data.items || []).forEach(i => all.push(i));
         }
       } catch {}
     }
