@@ -218,7 +218,7 @@ setTrends(final);.sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,20));
   const generate = async () => {
     setLoading(true); setResult(null); setError("");
     const tCtx = selTrends.length
-      ? `\n\nTENDÊNCIAS EM ALTA (incorpore):\n${selTrends.map(i=>`- [${trends[i].source}] ${trends[i].title}`).join("\n")}`
+      ? `\n\nTENDÊNCIAS EM ALTA INTERNACIONAIS (use como inspiração e adapte para o contexto brasileiro de automação e IA):\n${selTrends.map(i=>`- ${trends[i].title}`).join("\n")}`
       : "";
     const prompt = `Especialista em marketing digital de IA/Automação para empresas brasileiras.
 Crie roteiro COMPLETO (~60s) para Lucas Bissoli da NexusIA.
