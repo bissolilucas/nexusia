@@ -26,7 +26,7 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-4o-mini',
           max_tokens: body.max_tokens || 1200,
           messages: body.messages,
         }),
