@@ -30,8 +30,8 @@ export default async function handler(req, res) {
           max_tokens: body.max_tokens || 1200,
           response_format: { type: "json_object" },
           messages: [
-            { role: "system", content: "Você responde SOMENTE com JSON válido, sem markdown, sem explicações, sem blocos de código." },
-            ...body.messages
+            { role: "system", content: "Você é um copywriter brasileiro especialista em marketing digital. Responda SOMENTE com JSON válido, sem markdown, sem explicações, sem blocos de código. O JSON deve conter exatamente os campos: tema, gancho, gatilho, pilar, roteiro, legenda, cta." },
+            { role: "user", content: body.messages?.[body.messages.length - 1]?.content || "" }
           ],
         }),
       });
