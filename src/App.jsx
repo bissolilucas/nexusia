@@ -227,7 +227,8 @@ if (!data.content || !data.content.length) {
   return;
 }
 
-const text = data.content.map(b => b.text || "").join("");
+const rawText = data.content?.map(b => b.text || "").join("") || data.choices?.[0]?.message?.content || "";
+const text = rawText;
 let parsed;
 try {
   const clean = text.replace(/```json|```/g, "").trim();
