@@ -205,13 +205,35 @@ if (!data.content || !data.content.length) {
 }
 
 const text = data.content.map(b => b.text || "").join("");
-const jsonMatch = text.match(/\{[\s\S]*\}/);
-if (!jsonMatch) {
-  setError("Formato inválido na resposta.");
-  setLoading(false);
-  return;
+let parsed;
+try {
+  const clean = text.replace(/```json|```/g, "").trim();
+  const jsonMatch = clean.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("sem JSON");
+  parsed = JSON.parse(jsonMatch[0]);
+} catch {
+  try {
+    // Tenta extrair campos manualmente se JSON quebrado
+    const extract = (field) => {
+      const m = text.match(new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*\\})`));
+      return m ? m[1].replace(/\\n/g, "\n") : "";
+    };
+    parsed = {
+      tema: extract("tema"),
+      gancho: extract("gancho"),
+      gatilho: extract("gatilho") || gatilho,
+      pilar: extract("pilar") || pilar,
+      roteiro: extract("roteiro"),
+      legenda: extract("legenda"),
+      cta: extract("cta"),
+    };
+    if (!parsed.tema) throw new Error("extração falhou");
+  } catch {
+    setError("Formato inválido na resposta. Tente usar o modelo Claude.");
+    setLoading(false);
+    return;
+  }
 }
-const parsed = JSON.parse(jsonMatch[0]);
       parsed.day = nextDay; parsed.fmt = fmt; parsed.date = new Date().toLocaleDateString("pt-BR");
       if (selTrends.length) parsed.trendBased = true;
       const list = [parsed, ...generated];
