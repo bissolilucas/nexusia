@@ -163,21 +163,44 @@ const [provider, setProvider] = useState("claude");
     const tCtx = selTrends.length
       ? `\n\nTENDÊNCIAS EM ALTA INTERNACIONAIS (use como inspiração e adapte para o contexto brasileiro de automação e IA):\n${selTrends.map(i => `- ${trends[i].title}`).join("\n")}`
       : "";
-    const prompt = `Você é o melhor copywriter de marketing digital do Brasil, especialista em IA e automação para empresas.
-Crie um roteiro COMPLETO e CRIATIVO para Lucas Bissoli da NexusIA. O conteúdo deve ser irresistível, provocador e gerar engajamento imediato.
+    const formatInstructions = {
+  "REELS": `FORMATO REELS (vídeo narrado):
+- Roteiro narrado em voz: OBRIGATORIAMENTE entre 160 e 200 palavras
+- Estrutura: 1) Gancho impactante (2-3 frases), 2) Problema detalhado com dados ou história real (4-5 frases), 3) Solução com exemplos concretos (4-5 frases), 4) Prova social ou resultado (2-3 frases), 5) Fechamento poderoso (2 frases)
+- Use '...' para pausas dramáticas e perguntas retóricas
+- Linguagem conversacional, como se estivesse falando direto para a câmera`,
+
+  "CARROSSEL": `FORMATO CARROSSEL INSTAGRAM (sequência de imagens):
+- Crie EXATAMENTE entre 6 e 8 slides
+- SLIDE 1 (Capa): Título impactante de no máximo 8 palavras que para o scroll. Subtítulo curto opcional.
+- SLIDES 2 a 6/7 (Conteúdo): Cada slide com UM ponto específico. Título curto (3-5 palavras) + texto de 2-3 linhas curtas. Os slides devem se conectar como uma história progressiva, cada um levando naturalmente ao próximo.
+- ÚLTIMO SLIDE (CTA): Frase de fechamento poderosa + chamada para ação direta
+- Use emojis estratégicos em cada slide
+- Formato do roteiro: "SLIDE 1: [título] | [texto]\nSLIDE 2: [título] | [texto]\n..." e assim por diante
+- Cada slide deve ter no máximo 25 palavras no total`,
+
+  "POST FEED": `FORMATO POST FEED INSTAGRAM (imagem única):
+- TEXTO DA IMAGEM: frase principal de no máximo 10 palavras, impactante e direta, que funcione visualmente
+- LEGENDA: mínimo 8 linhas envolventes com storytelling ou dado relevante. Use emojis estratégicos. Quebre em parágrafos curtos. Termine sempre com 3-5 hashtags relevantes.
+- O roteiro deve conter: "IMAGEM: [texto da imagem]\n\nLEGENDA:\n[legenda completa]"`,
+};
+
+const prompt = `Você é o melhor copywriter de marketing digital do Brasil, especialista em IA e automação para empresas.
+Crie conteúdo COMPLETO e CRIATIVO para Lucas Bissoli da NexusIA. O conteúdo deve ser irresistível, provocador e gerar engajamento imediato no Instagram.
 
 FORMATO: ${fmt}
 PILAR: ${pilar}
 GATILHO EMOCIONAL: ${gatilho}
 ${temaInput ? `TEMA: ${temaInput}` : ""}${tCtx}
 
-REGRAS OBRIGATÓRIAS:
+INSTRUÇÕES DO FORMATO:
+${formatInstructions[fmt]}
+
+REGRAS GERAIS OBRIGATÓRIAS:
 - Gancho nos primeiros 3 segundos — deve parar o scroll imediatamente
-- Use storytelling, dados reais, analogias poderosas ou provocações
-- Linguagem natural, brasileira, como se estivesse conversando
+- Linguagem natural, brasileira, direta e envolvente
 - Nunca seja genérico — seja específico, surpreendente e memorável
-- Terminar com CTA direto e irresistível
-${fmt === "REELS" ? "- Roteiro narrado em voz: mínimo 150 palavras, máximo 180. Ritmo dinâmico, frases curtas e impactantes. Use pausas dramáticas com '...' e perguntas retóricas." : fmt === "CARROSSEL" ? "- Mínimo 7 slides. Cada slide com título impactante + 2-3 linhas de conteúdo rico. Progressão lógica que prende até o final." : "- Texto principal da imagem (máximo 10 palavras impactantes) + legenda completa e envolvente com mínimo 5 linhas."}
+- Use dados reais, analogias poderosas ou provocações quando possível
 
 TEMAS JÁ USADOS — CRIE ALGO COMPLETAMENTE DIFERENTE:
 ${usedThemes.map((t, i) => `${i + 1}. ${t}`).join("\n")}
