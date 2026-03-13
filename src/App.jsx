@@ -337,7 +337,7 @@ try {
                 )}
                 <Label>Modelo de IA</Label>
                 <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-                {[["claude", "Claude (Anthropic)"], ["openai", "ChatGPT (OpenAI)"]].map(([id, label]) => (
+                {[["claude", "IA Nexus Uno"], ["openai", "IA Nexus Due"]].map(([id, label]) => (
                 <button key={id} onClick={() => setProvider(id)} style={{ flex: 1, padding: "9px 0", borderRadius: 11, border: `2px solid ${provider === id ? "#6366f1" : "#e5e7eb"}`, background: provider === id ? "#eef2ff" : "#fafafa", color: provider === id ? "#6366f1" : "#9ca3af", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 11, cursor: "pointer", transition: "all .15s" }}>{label}</button>
                  ))}
                </div>
