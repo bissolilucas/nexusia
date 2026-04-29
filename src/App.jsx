@@ -33,7 +33,6 @@ const PLANNER = [
   { day: 30, format: "POST FEED", tema: "Mensagem final de autoridade", gancho: "30 dias de conteúdo. Uma mensagem final para quem ainda está em dúvida.", gatilho: "Autoridade", pilar: "Autoridade em IA", roteiro: `[Foto profissional]\n\n"Automação e IA não são o futuro do seu negócio.\nJá são o presente.\nE o presente pertence a quem age."\n\n— Lucas Bissoli | NexusIA`, legenda: `30 dias falando sobre atendimento automático, CRM, follow-up e resultados reais.\n\nTudo com um fio condutor: empresas que usam tecnologia crescem mais rápido.\n\nA pergunta que resta é: quando você vai começar?`, cta: "Quer ver como isso funcionaria no seu negócio? Me chama no direct agora." },
 ];
 
-const FORMATS = ["REELS", "CARROSSEL", "POST FEED"];
 const REELS_PLANNER = [
   { dia: 1, reels: [
     { seg: "EMPRESAS", pub: "Donos de empresa", tema: "Seu concorrente já usa IA — você não", gancho: "Enquanto você lê isso, seu concorrente pode estar usando IA para roubar seus clientes.", roteiro: "Dois negócios. Mesmo segmento. Mesma cidade.\n\nUm responde manualmente. Às vezes demora 2 horas.\n\nO outro tem uma IA que responde em 1 segundo, 24 horas por dia.\n\nUm cliente manda mensagem para os dois ao mesmo tempo.\n\nQuem ele vai escolher?\n\nNão precisa ser melhor. Não precisa ser mais barato.\n\nSó precisa responder primeiro.\n\nE a triste realidade é que você não sabe se o seu concorrente já está fazendo isso.\n\nA única forma de garantir é agir antes.", dicas: "Grave na rua ou em frente ao seu negócio. Use cortes rápidos a cada frase.", cta: "Comenta IA aqui embaixo que eu te explico." },
@@ -86,6 +85,8 @@ const REELS_PLANNER = [
     { seg: "SAÚDE", pub: "Clínicas", tema: "Triagem automática de pacientes", gancho: "Antes de o paciente chegar à recepção, a IA já sabe o que ele precisa.", roteiro: "Paciente manda mensagem para a clínica.\n\nSem automação: recepcionista pergunta nome, queixa, plano de saúde, disponibilidade. Um por um.\n\nCom automação: a IA faz a triagem completa.\n\nColeta sintomas, urgência, plano de saúde, preferência de médico e horário.\n\nJá direciona para a especialidade correta.\n\nRecepcionista recebe o paciente já triado.\n\nAtendimento mais rápido. Paciente mais satisfeito. Equipe mais eficiente.", dicas: "Tom técnico e clínico. Foco na eficiência operacional.", cta: "Clínica multiprofissional? Me conta o segmento." },
   ]},
 ];
+
+const FORMATS = ["REELS", "CARROSSEL", "POST FEED"];
 const PILLARS = ["Autoridade em IA", "Educação do mercado", "Prova social", "Bastidores de automação", "Conteúdo viral"];
 const TRIGGERS = ["Curiosidade", "Medo de ficar para trás", "Dor financeira", "Prova social", "Quebra de crença", "Choque", "Oportunidade", "Transformação", "Visão de futuro", "Autoridade", "Resultado", "Diagnóstico", "Analogia simples"];
 const FMT = { "REELS": { color: "#f97316", bg: "#fff7ed" }, "CARROSSEL": { color: "#7c3aed", bg: "#f5f3ff" }, "POST FEED": { color: "#0891b2", bg: "#ecfeff" } };
@@ -154,15 +155,15 @@ export default function App() {
   const [temaInput, setTemaInput] = useState("");
   const [copied, setCopied] = useState(null);
   const [expanded, setExpanded] = useState(null);
- const [plannerOpen, setPlannerOpen] = useState(null);
-const [reelsOpen, setReelsOpen] = useState(null);
-const [reelsDone, setReelsDone] = useState({});
+  const [plannerOpen, setPlannerOpen] = useState(null);
+  const [reelsOpen, setReelsOpen] = useState(null);
+  const [reelsDone, setReelsDone] = useState({});
   const [trends, setTrends] = useState([]);
   const [selTrends, setSelTrends] = useState([]);
   const [loadingTrends, setLoadingTrends] = useState(false);
   const [trendsLoaded, setTrendsLoaded] = useState(false);
   const [activeSrc, setActiveSrc] = useState(["instagram", "tiktok", "youtube"]);
-const [provider, setProvider] = useState("claude");
+  const [provider, setProvider] = useState("claude");
 
   useEffect(() => {
     load("nexusia_v7", []).then(setGenerated);
@@ -177,7 +178,7 @@ const [provider, setProvider] = useState("claude");
   const fetchTrends = async () => {
     setLoadingTrends(true); setTrends([]); setSelTrends([]); setTrendsLoaded(false);
     const all = [];
-   for (const src of FREE_SOURCES.filter(s => activeSrc.includes(s.id))) {
+    for (const src of FREE_SOURCES.filter(s => activeSrc.includes(s.id))) {
       try {
         if (src.url && src.parse) {
           src.parse(await fetch(src.url).then(r => r.json())).forEach(i => all.push(i));
@@ -190,8 +191,6 @@ const [provider, setProvider] = useState("claude");
     const kw = ["ai", "artificial", "automat", "chatgpt", "llm", "gpt", "bot", "workflow", "crm", "whatsapp"];
     const filtered = all.filter(t => kw.some(k => (t.title + " " + t.snippet).toLowerCase().includes(k)));
     const top = (filtered.length > 3 ? filtered : all).sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 15);
-
-    // Traduz títulos para PT-BR
     try {
       const translatePrompt = `Traduza os títulos abaixo para português brasileiro de forma natural e direta. Retorne SOMENTE um array JSON com os títulos traduzidos na mesma ordem, sem explicações:\n${JSON.stringify(top.map(t => t.title))}`;
       const tRes = await fetch("/api/generate", {
@@ -207,7 +206,6 @@ const [provider, setProvider] = useState("claude");
     } catch {
       setTrends(top);
     }
-
     setTrendsLoaded(true);
     setLoadingTrends(false);
   };
@@ -218,28 +216,11 @@ const [provider, setProvider] = useState("claude");
       ? `\n\nTENDÊNCIAS EM ALTA INTERNACIONAIS (use como inspiração e adapte para o contexto brasileiro de automação e IA):\n${selTrends.map(i => `- ${trends[i].title}`).join("\n")}`
       : "";
     const formatInstructions = {
-  "REELS": `FORMATO REELS (vídeo narrado):
-- Roteiro narrado em voz: OBRIGATORIAMENTE entre 160 e 200 palavras
-- Estrutura: 1) Gancho impactante (2-3 frases), 2) Problema detalhado com dados ou história real (4-5 frases), 3) Solução com exemplos concretos (4-5 frases), 4) Prova social ou resultado (2-3 frases), 5) Fechamento poderoso (2 frases)
-- Use '...' para pausas dramáticas e perguntas retóricas
-- Linguagem conversacional, como se estivesse falando direto para a câmera`,
-
-  "CARROSSEL": `FORMATO CARROSSEL INSTAGRAM (sequência de imagens):
-- Crie EXATAMENTE entre 6 e 8 slides
-- SLIDE 1 (Capa): Título impactante de no máximo 8 palavras que para o scroll. Subtítulo curto opcional.
-- SLIDES 2 a 6/7 (Conteúdo): Cada slide com UM ponto específico. Título curto (3-5 palavras) + texto de 2-3 linhas curtas. Os slides devem se conectar como uma história progressiva, cada um levando naturalmente ao próximo.
-- ÚLTIMO SLIDE (CTA): Frase de fechamento poderosa + chamada para ação direta
-- Use emojis estratégicos em cada slide
-- Formato do roteiro: "SLIDE 1: [título] | [texto]\nSLIDE 2: [título] | [texto]\n..." e assim por diante
-- Cada slide deve ter no máximo 25 palavras no total`,
-
-  "POST FEED": `FORMATO POST FEED INSTAGRAM (imagem única):
-- TEXTO DA IMAGEM: frase principal de no máximo 10 palavras, impactante e direta, que funcione visualmente
-- LEGENDA: mínimo 8 linhas envolventes com storytelling ou dado relevante. Use emojis estratégicos. Quebre em parágrafos curtos. Termine sempre com 3-5 hashtags relevantes.
-- O roteiro deve conter: "IMAGEM: [texto da imagem]\n\nLEGENDA:\n[legenda completa]"`,
-};
-
-const prompt = `Você é o melhor copywriter de marketing digital do Brasil, especialista em IA e automação para empresas.
+      "REELS": `FORMATO REELS (vídeo narrado):\n- Roteiro narrado em voz: OBRIGATORIAMENTE entre 160 e 200 palavras\n- Estrutura: 1) Gancho impactante (2-3 frases), 2) Problema detalhado com dados ou história real (4-5 frases), 3) Solução com exemplos concretos (4-5 frases), 4) Prova social ou resultado (2-3 frases), 5) Fechamento poderoso (2 frases)\n- Use '...' para pausas dramáticas e perguntas retóricas\n- Linguagem conversacional, como se estivesse falando direto para a câmera`,
+      "CARROSSEL": `FORMATO CARROSSEL INSTAGRAM (sequência de imagens):\n- Crie EXATAMENTE entre 6 e 8 slides\n- SLIDE 1 (Capa): Título impactante de no máximo 8 palavras que para o scroll. Subtítulo curto opcional.\n- SLIDES 2 a 6/7 (Conteúdo): Cada slide com UM ponto específico. Título curto (3-5 palavras) + texto de 2-3 linhas curtas. Os slides devem se conectar como uma história progressiva, cada um levando naturalmente ao próximo.\n- ÚLTIMO SLIDE (CTA): Frase de fechamento poderosa + chamada para ação direta\n- Use emojis estratégicos em cada slide\n- Formato do roteiro: "SLIDE 1: [título] | [texto]\\nSLIDE 2: [título] | [texto]\\n..." e assim por diante\n- Cada slide deve ter no máximo 25 palavras no total`,
+      "POST FEED": `FORMATO POST FEED INSTAGRAM (imagem única):\n- TEXTO DA IMAGEM: frase principal de no máximo 10 palavras, impactante e direta, que funcione visualmente\n- LEGENDA: mínimo 8 linhas envolventes com storytelling ou dado relevante. Use emojis estratégicos. Quebre em parágrafos curtos. Termine sempre com 3-5 hashtags relevantes.\n- O roteiro deve conter: "IMAGEM: [texto da imagem]\\n\\nLEGENDA:\\n[legenda completa]"`,
+    };
+    const prompt = `Você é o melhor copywriter de marketing digital do Brasil, especialista em IA e automação para empresas.
 Crie conteúdo COMPLETO e CRIATIVO para Lucas Bissoli da NexusIA. O conteúdo deve ser irresistível, provocador e gerar engajamento imediato no Instagram.
 
 FORMATO: ${fmt}
@@ -268,50 +249,29 @@ Responda SOMENTE JSON válido sem markdown:
         body: JSON.stringify({ provider, model: "claude-haiku-4-5-20251001", max_tokens: 1200, messages: [{ role: "user", content: prompt }] }),
       });
       const data = await res.json();
-
-if (data.error) {
-  setError("Erro da API: " + (data.error.message || JSON.stringify(data.error)));
-  setLoading(false);
-  return;
-}
-
-if (!data.content || !data.content.length) {
-  setError("Resposta vazia. Verifique sua chave de API.");
-  setLoading(false);
-  return;
-}
-
-const rawText = data.content?.map(b => b.text || "").join("") || data.choices?.[0]?.message?.content || "";
-const text = rawText;
-let parsed;
-try {
-  const clean = text.replace(/```json|```/g, "").trim();
-  const jsonMatch = clean.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error("sem JSON");
-  parsed = JSON.parse(jsonMatch[0]);
-} catch {
-  try {
-    // Tenta extrair campos manualmente se JSON quebrado
-    const extract = (field) => {
-      const m = text.match(new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*\\})`));
-      return m ? m[1].replace(/\\n/g, "\n") : "";
-    };
-    parsed = {
-      tema: extract("tema"),
-      gancho: extract("gancho"),
-      gatilho: extract("gatilho") || gatilho,
-      pilar: extract("pilar") || pilar,
-      roteiro: extract("roteiro"),
-      legenda: extract("legenda"),
-      cta: extract("cta"),
-    };
-    if (!parsed.tema) throw new Error("extração falhou");
-  } catch {
-    setError("Formato inválido na resposta. Tente usar o modelo Claude.");
-    setLoading(false);
-    return;
-  }
-}
+      if (data.error) { setError("Erro da API: " + (data.error.message || JSON.stringify(data.error))); setLoading(false); return; }
+      if (!data.content || !data.content.length) { setError("Resposta vazia. Verifique sua chave de API."); setLoading(false); return; }
+      const rawText = data.content?.map(b => b.text || "").join("") || data.choices?.[0]?.message?.content || "";
+      let parsed;
+      try {
+        const clean = rawText.replace(/```json|```/g, "").trim();
+        const jsonMatch = clean.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error("sem JSON");
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch {
+        try {
+          const extract = (field) => {
+            const m = rawText.match(new RegExp(`"${field}"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*,\\s*"|\\s*\\})`));
+            return m ? m[1].replace(/\\n/g, "\n") : "";
+          };
+          parsed = { tema: extract("tema"), gancho: extract("gancho"), gatilho: extract("gatilho") || gatilho, pilar: extract("pilar") || pilar, roteiro: extract("roteiro"), legenda: extract("legenda"), cta: extract("cta") };
+          if (!parsed.tema) throw new Error("extração falhou");
+        } catch {
+          setError("Formato inválido na resposta. Tente usar o modelo Claude.");
+          setLoading(false);
+          return;
+        }
+      }
       parsed.day = nextDay; parsed.fmt = fmt; parsed.date = new Date().toLocaleDateString("pt-BR");
       if (selTrends.length) parsed.trendBased = true;
       const list = [parsed, ...generated];
@@ -360,6 +320,7 @@ try {
       </header>
 
       <main style={{ maxWidth: 1160, margin: "0 auto", padding: "32px 28px" }}>
+
         {tab === "gerar" && (
           <div className="fade-in" style={{ display: "grid", gridTemplateColumns: "350px 1fr", gap: 20, alignItems: "start" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -392,10 +353,10 @@ try {
                 )}
                 <Label>Modelo de IA</Label>
                 <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-                {[["claude", "IA Nexus Uno"], ["openai", "IA Nexus Due"]].map(([id, label]) => (
-                <button key={id} onClick={() => setProvider(id)} style={{ flex: 1, padding: "9px 0", borderRadius: 11, border: `2px solid ${provider === id ? "#6366f1" : "#e5e7eb"}`, background: provider === id ? "#eef2ff" : "#fafafa", color: provider === id ? "#6366f1" : "#9ca3af", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 11, cursor: "pointer", transition: "all .15s" }}>{label}</button>
-                 ))}
-               </div>
+                  {[["claude", "IA Nexus Uno"], ["openai", "IA Nexus Due"]].map(([id, label]) => (
+                    <button key={id} onClick={() => setProvider(id)} style={{ flex: 1, padding: "9px 0", borderRadius: 11, border: `2px solid ${provider === id ? "#6366f1" : "#e5e7eb"}`, background: provider === id ? "#eef2ff" : "#fafafa", color: provider === id ? "#6366f1" : "#9ca3af", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 11, cursor: "pointer", transition: "all .15s" }}>{label}</button>
+                  ))}
+                </div>
                 <button className="btn-primary" onClick={generate} disabled={loading}>
                   {loading
                     ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
@@ -411,7 +372,7 @@ try {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
                   <div>
                     <h3 style={{ fontWeight: 700, fontSize: 15, color: "#111" }}>📡 Tendências Agora</h3>
-                    <p style={{ fontSize: 11, color: "#9ca3af", marginTop: 2 }}>Reddit · Dev.to · HN — 100% grátis</p>
+                    <p style={{ fontSize: 11, color: "#9ca3af", marginTop: 2 }}>Google News · Dev.to — 100% grátis</p>
                   </div>
                   <button onClick={fetchTrends} disabled={loadingTrends} style={{ padding: "7px 14px", borderRadius: 10, border: "none", background: loadingTrends ? "#e5e7eb" : "linear-gradient(135deg,#6366f1,#8b5cf6)", color: loadingTrends ? "#9ca3af" : "#fff", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 12, cursor: loadingTrends ? "not-allowed" : "pointer" }}>
                     {loadingTrends ? "..." : "🔄 Buscar"}
@@ -425,7 +386,7 @@ try {
                   ))}
                 </div>
                 {!trendsLoaded && !loadingTrends && (
-                  <div style={{ textAlign: "center", padding: "22px 0", color: "#d1d5db" }}>
+                  <div style={{ textAlign: "center", padding: "22px 0" }}>
                     <div style={{ fontSize: 32, marginBottom: 8 }}>📡</div>
                     <div style={{ fontSize: 13, color: "#9ca3af" }}>Selecione as fontes e clique em Buscar</div>
                   </div>
@@ -528,82 +489,83 @@ try {
           </div>
         )}
 
-        {tab === "planner" && (
-      {tab === "reels" && (
-  <div className="fade-in">
-    <div style={{ marginBottom: 28 }}>
-      <h2 style={{ fontWeight: 800, fontSize: 26, color: "#111", letterSpacing: "-0.5px" }}>🎬 Reels 30 Dias</h2>
-      <p style={{ color: "#9ca3af", fontSize: 14, marginTop: 4 }}>3 reels por dia · 70% Empresas · 30% Saúde · Clique para ver o roteiro</p>
-      <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#6366f1", background: "#eef2ff", padding: "4px 12px", borderRadius: 8, fontWeight: 700 }}>🏢 EMPRESAS</div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#059669", background: "#ecfdf5", padding: "4px 12px", borderRadius: 8, fontWeight: 700 }}>🏥 SAÚDE</div>
-        <div style={{ fontSize: 12, color: "#9ca3af", padding: "4px 12px" }}>{Object.keys(reelsDone).filter(k => reelsDone[k]).length} / {REELS_PLANNER.reduce((a, d) => a + d.reels.length, 0)} gravados</div>
-      </div>
-    </div>
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {REELS_PLANNER.map((diaObj) => (
-        <div key={diaObj.dia} className="card fade-up" style={{ overflow: "hidden" }}>
-          <div style={{ padding: "16px 22px", background: "linear-gradient(135deg,#f9fafb,#f3f4f6)", borderBottom: "1px solid #f3f4f6", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 11, background: "linear-gradient(135deg,#6366f1,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>{diaObj.dia}</span>
-              </div>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 15, color: "#111" }}>Dia {diaObj.dia}</div>
-                <div style={{ fontSize: 11, color: "#9ca3af" }}>{diaObj.reels.length} reels · {diaObj.reels.filter(r => reelsDone[`${diaObj.dia}-${diaObj.reels.indexOf(r)}`]).length} gravados</div>
+        {tab === "reels" && (
+          <div className="fade-in">
+            <div style={{ marginBottom: 28 }}>
+              <h2 style={{ fontWeight: 800, fontSize: 26, color: "#111", letterSpacing: "-0.5px" }}>🎬 Reels 30 Dias</h2>
+              <p style={{ color: "#9ca3af", fontSize: 14, marginTop: 4 }}>3 reels por dia · 70% Empresas · 30% Saúde · Clique para ver o roteiro</p>
+              <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#6366f1", background: "#eef2ff", padding: "4px 12px", borderRadius: 8, fontWeight: 700 }}>🏢 EMPRESAS</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#059669", background: "#ecfdf5", padding: "4px 12px", borderRadius: 8, fontWeight: 700 }}>🏥 SAÚDE</div>
+                <div style={{ fontSize: 12, color: "#9ca3af", padding: "4px 12px" }}>{Object.keys(reelsDone).filter(k => reelsDone[k]).length} / {REELS_PLANNER.reduce((a, d) => a + d.reels.length, 0)} gravados</div>
               </div>
             </div>
-            <button onClick={() => setReelsOpen(reelsOpen === diaObj.dia ? null : diaObj.dia)} style={{ background: "none", border: "none", color: "#6366f1", fontSize: 20, cursor: "pointer" }}>
-              {reelsOpen === diaObj.dia ? "▾" : "▸"}
-            </button>
-          </div>
-          {reelsOpen === diaObj.dia && (
-            <div className="fade-up" style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 20 }}>
-              {diaObj.reels.map((reel, idx) => {
-                const key = `${diaObj.dia}-${idx}`;
-                const done = reelsDone[key];
-                return (
-                  <div key={idx} style={{ border: `2px solid ${done ? "#bbf7d0" : reel.seg === "EMPRESAS" ? "#e0e7ff" : "#d1fae5"}`, borderRadius: 16, padding: 20, background: done ? "#f0fdf4" : "#fafafa", transition: "all .2s" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: reel.seg === "EMPRESAS" ? "#6366f1" : "#059669", background: reel.seg === "EMPRESAS" ? "#eef2ff" : "#ecfdf5", padding: "3px 10px", borderRadius: 7 }}>{reel.seg === "EMPRESAS" ? "🏢" : "🏥"} {reel.seg}</span>
-                        <span style={{ fontSize: 10, color: "#9ca3af", background: "#f3f4f6", padding: "3px 10px", borderRadius: 7 }}>{reel.pub}</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {REELS_PLANNER.map((diaObj) => (
+                <div key={diaObj.dia} className="card fade-up" style={{ overflow: "hidden" }}>
+                  <div style={{ padding: "16px 22px", background: "linear-gradient(135deg,#f9fafb,#f3f4f6)", borderBottom: "1px solid #f3f4f6", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{ width: 38, height: 38, borderRadius: 11, background: "linear-gradient(135deg,#6366f1,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <span style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>{diaObj.dia}</span>
                       </div>
-                      <button onClick={() => setReelsDone(p => ({ ...p, [key]: !p[key] }))} style={{ padding: "6px 14px", borderRadius: 10, border: `2px solid ${done ? "#22c55e" : "#e5e7eb"}`, background: done ? "#f0fdf4" : "#fff", color: done ? "#16a34a" : "#9ca3af", fontFamily: "inherit", fontWeight: 700, fontSize: 11, cursor: "pointer", transition: "all .15s", whiteSpace: "nowrap" }}>
-                        {done ? "✅ Gravado" : "○ Marcar"}
-                      </button>
-                    </div>
-                    <div style={{ fontWeight: 800, fontSize: 17, color: "#111", marginBottom: 10, letterSpacing: "-0.3px" }}>{reel.tema}</div>
-                    <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "10px 14px", marginBottom: 12 }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>🪝 GANCHO</div>
-                      <p style={{ fontSize: 13, color: "#92400e", fontStyle: "italic", lineHeight: 1.5 }}>"{reel.gancho}"</p>
-                    </div>
-                    <div style={{ marginBottom: 12 }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 6 }}>🎬 ROTEIRO</div>
-                      <div style={{ background: "#f9fafb", borderRadius: 10, padding: "12px 14px" }}>
-                        <p style={{ fontSize: 13, color: "#374151", whiteSpace: "pre-wrap", lineHeight: 1.8 }}>{reel.roteiro}</p>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 15, color: "#111" }}>Dia {diaObj.dia}</div>
+                        <div style={{ fontSize: 11, color: "#9ca3af" }}>{diaObj.reels.length} reels · {diaObj.reels.filter((r, idx) => reelsDone[`${diaObj.dia}-${idx}`]).length} gravados</div>
                       </div>
                     </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                      <div style={{ background: "#f0fdf4", borderRadius: 10, padding: "10px 14px" }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>📹 DICAS</div>
-                        <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.5 }}>{reel.dicas}</p>
-                      </div>
-                      <div style={{ background: "#eef2ff", borderRadius: 10, padding: "10px 14px" }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>📣 CTA</div>
-                        <p style={{ fontSize: 12, color: "#4338ca", fontWeight: 600, lineHeight: 1.5 }}>{reel.cta}</p>
-                      </div>
-                    </div>
+                    <button onClick={() => setReelsOpen(reelsOpen === diaObj.dia ? null : diaObj.dia)} style={{ background: "none", border: "none", color: "#6366f1", fontSize: 20, cursor: "pointer" }}>
+                      {reelsOpen === diaObj.dia ? "▾" : "▸"}
+                    </button>
                   </div>
-                );
-              })}
+                  {reelsOpen === diaObj.dia && (
+                    <div className="fade-up" style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 20 }}>
+                      {diaObj.reels.map((reel, idx) => {
+                        const key = `${diaObj.dia}-${idx}`;
+                        const done = reelsDone[key];
+                        return (
+                          <div key={idx} style={{ border: `2px solid ${done ? "#bbf7d0" : reel.seg === "EMPRESAS" ? "#e0e7ff" : "#d1fae5"}`, borderRadius: 16, padding: 20, background: done ? "#f0fdf4" : "#fafafa", transition: "all .2s" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: reel.seg === "EMPRESAS" ? "#6366f1" : "#059669", background: reel.seg === "EMPRESAS" ? "#eef2ff" : "#ecfdf5", padding: "3px 10px", borderRadius: 7 }}>{reel.seg === "EMPRESAS" ? "🏢" : "🏥"} {reel.seg}</span>
+                                <span style={{ fontSize: 10, color: "#9ca3af", background: "#f3f4f6", padding: "3px 10px", borderRadius: 7 }}>{reel.pub}</span>
+                              </div>
+                              <button onClick={() => setReelsDone(p => ({ ...p, [key]: !p[key] }))} style={{ padding: "6px 14px", borderRadius: 10, border: `2px solid ${done ? "#22c55e" : "#e5e7eb"}`, background: done ? "#f0fdf4" : "#fff", color: done ? "#16a34a" : "#9ca3af", fontFamily: "inherit", fontWeight: 700, fontSize: 11, cursor: "pointer", transition: "all .15s", whiteSpace: "nowrap" }}>
+                                {done ? "✅ Gravado" : "○ Marcar"}
+                              </button>
+                            </div>
+                            <div style={{ fontWeight: 800, fontSize: 17, color: "#111", marginBottom: 10, letterSpacing: "-0.3px" }}>{reel.tema}</div>
+                            <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "10px 14px", marginBottom: 12 }}>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>🪝 GANCHO</div>
+                              <p style={{ fontSize: 13, color: "#92400e", fontStyle: "italic", lineHeight: 1.5 }}>"{reel.gancho}"</p>
+                            </div>
+                            <div style={{ marginBottom: 12 }}>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 6 }}>🎬 ROTEIRO</div>
+                              <div style={{ background: "#f9fafb", borderRadius: 10, padding: "12px 14px" }}>
+                                <p style={{ fontSize: 13, color: "#374151", whiteSpace: "pre-wrap", lineHeight: 1.8 }}>{reel.roteiro}</p>
+                              </div>
+                            </div>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                              <div style={{ background: "#f0fdf4", borderRadius: 10, padding: "10px 14px" }}>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>📹 DICAS</div>
+                                <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.5 }}>{reel.dicas}</p>
+                              </div>
+                              <div style={{ background: "#eef2ff", borderRadius: 10, padding: "10px 14px" }}>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>📣 CTA</div>
+                                <p style={{ fontSize: 12, color: "#4338ca", fontWeight: 600, lineHeight: 1.5 }}>{reel.cta}</p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+          </div>
+        )}
+
+        {tab === "planner" && (
           <div className="fade-in">
             <div style={{ marginBottom: 28 }}>
               <h2 style={{ fontWeight: 800, fontSize: 26, color: "#111", letterSpacing: "-0.5px" }}>Planner 30 Dias</h2>
@@ -635,6 +597,7 @@ try {
             </div>
           </div>
         )}
+
       </main>
     </div>
   );
