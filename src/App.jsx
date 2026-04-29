@@ -34,6 +34,58 @@ const PLANNER = [
 ];
 
 const FORMATS = ["REELS", "CARROSSEL", "POST FEED"];
+const REELS_PLANNER = [
+  { dia: 1, reels: [
+    { seg: "EMPRESAS", pub: "Donos de empresa", tema: "Seu concorrente já usa IA — você não", gancho: "Enquanto você lê isso, seu concorrente pode estar usando IA para roubar seus clientes.", roteiro: "Dois negócios. Mesmo segmento. Mesma cidade.\n\nUm responde manualmente. Às vezes demora 2 horas.\n\nO outro tem uma IA que responde em 1 segundo, 24 horas por dia.\n\nUm cliente manda mensagem para os dois ao mesmo tempo.\n\nQuem ele vai escolher?\n\nNão precisa ser melhor. Não precisa ser mais barato.\n\nSó precisa responder primeiro.\n\nE a triste realidade é que você não sabe se o seu concorrente já está fazendo isso.\n\nA única forma de garantir é agir antes.", dicas: "Grave na rua ou em frente ao seu negócio. Use cortes rápidos a cada frase.", cta: "Comenta IA aqui embaixo que eu te explico." },
+    { seg: "EMPRESAS", pub: "Empreendedores", tema: "Quanto custa não ter automação", gancho: "Você sabe exatamente quanto dinheiro está perdendo por não ter automação?", roteiro: "Imagina 10 clientes chegando no seu WhatsApp hoje.\n\nVocê responde 7. 3 ficam sem resposta.\n\nEsses 3 foram para o concorrente.\n\nSe o ticket médio do seu negócio é mil reais...\n\nVocê acabou de perder 3 mil reais hoje.\n\nMultiplicado por 5 dias da semana... 15 mil por semana.\n\n60 mil por mês.\n\nNão por preço. Não porque seu serviço é pior.\n\nPor falta de velocidade.\n\nAutomação com IA resolve exatamente isso.", dicas: "Use texto na tela com os números enquanto fala.", cta: "Me chama no direct e calcula o quanto você pode recuperar." },
+    { seg: "SAÚDE", pub: "Médicos e clínicas", tema: "Pacientes sumindo antes do agendamento", gancho: "73% dos pacientes que não recebem resposta rápida vão para outra clínica.", roteiro: "É noite. Um paciente está com dor e procura uma clínica no Google.\n\nEncontra a sua. Manda mensagem no WhatsApp.\n\nNinguém responde até de manhã.\n\nEle já agendou em outro lugar.\n\nIsso acontece todo dia em clínicas que dependem de uma recepcionista para responder tudo.\n\nA solução? Uma IA que responde imediatamente, coleta os dados do paciente, verifica a agenda e já oferece os horários disponíveis.\n\nTudo em segundos. Sem precisar acordar ninguém.", dicas: "Grave num ambiente de clínica. Use jaleco se possível.", cta: "Clínica ou consultório? Me conta nos comentários qual é o seu." },
+  ]},
+  { dia: 2, reels: [
+    { seg: "EMPRESAS", pub: "Donos de negócio", tema: "O que é um agente de IA na prática", gancho: "Todo mundo fala em IA mas ninguém explica o que ela realmente faz no dia a dia de um negócio.", roteiro: "Agente de IA não é robô de ficção científica.\n\nÉ um sistema que conversa com seus clientes no WhatsApp como se fosse um atendente humano.\n\nEle recebe a mensagem, entende o que o cliente quer, responde com a linguagem da sua empresa e já encaminha para o próximo passo.\n\nSe for agendamento, verifica a agenda e confirma o horário.\n\nSe for dúvida, responde com as informações do seu negócio.\n\nSe for orçamento, coleta os dados e avisa sua equipe.\n\nTudo automático. Tudo rápido. Tudo no seu WhatsApp.", dicas: "Mostre a tela do celular com exemplos de conversa enquanto narra.", cta: "Qual seria o primeiro processo que você automatizaria? Comenta aqui." },
+    { seg: "EMPRESAS", pub: "Empreendedores digitais", tema: "3 automações para implementar essa semana", gancho: "3 automações que qualquer empresa pode implementar essa semana e já sentir resultado.", roteiro: "Primeira: resposta automática no WhatsApp.\n\nCliente manda mensagem. IA responde em menos de 1 segundo. Sempre.\n\nSegunda: follow-up automático.\n\nCliente pediu orçamento e sumiu? A IA manda mensagem de acompanhamento em 24 horas.\n\nTerceira: agendamento automático.\n\nCliente escolhe horário disponível direto no WhatsApp. Sem ligação.\n\nTrês processos simples. Três problemas resolvidos.\n\nE o mais importante: você pode ter tudo isso rodando essa semana.", dicas: "Use três cards visuais na tela. Energia alta do início ao fim.", cta: "Qual dessas você precisa mais urgente? 1, 2 ou 3? Comenta aqui." },
+    { seg: "SAÚDE", pub: "Estética e beleza", tema: "Agenda cheia sem precisar ligar", gancho: "Sua agenda poderia estar cheia todo dia sem você ou sua equipe fazer uma ligação sequer.", roteiro: "Profissional de estética passa horas por dia confirmando agendamento, respondendo mensagem e organizando horário.\n\nIsso é tempo que poderia estar sendo usado no atendimento.\n\nCom automação, a cliente envia mensagem, a IA mostra os horários disponíveis, a cliente escolhe e confirma.\n\nNo dia anterior, a IA já manda lembrete automático para reduzir cancelamento.\n\nSe cancelar, o horário já vai para lista de espera.\n\nAgenda organizada. Zero ligação. Zero mensagem manual.", dicas: "Grave num salão ou espaço de estética. Mostre a agenda no celular.", cta: "Quantas horas por semana você gasta só organizando agenda? Comenta." },
+  ]},
+  { dia: 3, reels: [
+    { seg: "EMPRESAS", pub: "Gestores e CEOs", tema: "Por que sua equipe não consegue escalar", gancho: "Sua equipe não consegue atender mais clientes não porque é ruim. É porque o processo trava.", roteiro: "Uma equipe de 3 pessoas atende no máximo 3 clientes ao mesmo tempo.\n\nNão importa o quanto elas se esforcem. O limite é humano.\n\nQuando você automatiza o atendimento inicial com IA, esse limite some.\n\nA IA atende 100, 200, 500 clientes ao mesmo tempo.\n\nEla filtra, qualifica e só passa para sua equipe os clientes que estão prontos para fechar.\n\nSua equipe para de perder tempo com quem não vai comprar e foca em quem vai.\n\nResultado: mesma equipe, muito mais vendas.", dicas: "Use whiteboard ou animação simples para mostrar o funil.", cta: "Sua equipe consegue dar conta da demanda atual? Comenta sim ou não." },
+    { seg: "EMPRESAS", pub: "Pequenos empresários", tema: "IA não é caro — é investimento", gancho: "Todo mundo acha que automação com IA é caro. Então vou te mostrar a conta real.", roteiro: "Um atendente custa em média dois a três mil reais por mês.\n\nTrabalha 8 horas por dia. Falta. Fica doente. Comete erros.\n\nUma IA custa uma fração disso. Trabalha 24 horas. Nunca falta.\n\nE mais importante: ela atende 100 clientes ao mesmo tempo enquanto o atendente atende um.\n\nA questão não é se você pode pagar por automação.\n\nA questão é se você pode continuar pagando por não ter automação.\n\nCada cliente perdido por demora é dinheiro que foi para o concorrente.\n\nFaz a conta.", dicas: "Use calculadora na tela. Fale com confiança.", cta: "Faz sentido para você? Comenta e me conta seu segmento." },
+    { seg: "SAÚDE", pub: "Médicos", tema: "Consultório que funciona enquanto você opera", gancho: "E se seu consultório pudesse agendar consultas enquanto você está no centro cirúrgico?", roteiro: "Médico não pode estar no consultório e na cirurgia ao mesmo tempo.\n\nMas sua agenda pode estar se organizando enquanto você opera.\n\nCom um agente de IA, pacientes que mandam mensagem recebem resposta imediata.\n\nA IA verifica sua agenda em tempo real, oferece os horários disponíveis e confirma o agendamento.\n\nQuando você termina o procedimento, já tem novos pacientes agendados.\n\nSem secretária precisar interromper. Sem paciente ficar esperando.", dicas: "Tom profissional. Grave em ambiente médico se possível.", cta: "Médico aqui? Me conta qual especialidade nos comentários." },
+  ]},
+  { dia: 4, reels: [
+    { seg: "EMPRESAS", pub: "E-commerce", tema: "Recuperação de carrinho abandonado com IA", gancho: "70% dos clientes abandonam o carrinho. E a maioria pode ser recuperada com automação.", roteiro: "Cliente entrou na sua loja. Escolheu os produtos. Chegou no pagamento.\n\nE foi embora.\n\nSem automação, esse cliente some para sempre.\n\nCom um agente de IA, 30 minutos depois ele recebe uma mensagem personalizada.\n\nNão um spam genérico. Uma mensagem com o produto que ele estava olhando.\n\nEm média, 15 a 25% desses clientes voltam e finalizam a compra.\n\nSão vendas que você já tinha e quase perdeu.", dicas: "Mostre print de conversa de recuperação.", cta: "Tem loja online? Me conta e te mostro como funciona." },
+    { seg: "EMPRESAS", pub: "Prestadores de serviço", tema: "Follow-up que fecha vendas", gancho: "A maioria das vendas não é perdida na proposta. É perdida no silêncio depois dela.", roteiro: "Cliente pediu orçamento.\n\nVocê enviou uma proposta incrível.\n\nPassou um dia. Dois. Uma semana. Silêncio.\n\nO que a maioria faz? Nada. Fica esperando.\n\nO que automação faz? Manda follow-up no momento certo.\n\nNo dia seguinte: mensagem de acompanhamento.\n\nTrês dias depois: caso de sucesso de um cliente similar.\n\nUma semana depois: última tentativa com urgência.\n\nEm média, 25% dos leads que pareciam perdidos fecham só com follow-up automático.", dicas: "Use timeline visual na tela. Foque nos números.", cta: "Você faz follow-up manual hoje? Comenta como funciona." },
+    { seg: "SAÚDE", pub: "Clínicas de estética", tema: "Redução de no-show com IA", gancho: "Clínica com agenda cheia mas atendimento vazio. Você conhece esse problema?", roteiro: "No-show é o terror de toda clínica.\n\nPaciente agenda, você reserva o horário.\n\nE ele não aparece.\n\nCom automação, isso cai drasticamente.\n\nA IA manda lembrete 48 horas antes. Outro 24 horas. Um último no dia.\n\nSe o paciente cancelar, o horário vai automaticamente para uma lista de espera.\n\nNenhuma hora perdida. Nenhum dinheiro jogado fora.\n\nClínicas reduzem no-show em até 60% com esse sistema.", dicas: "Use dados visuais. Grave em ambiente de clínica.", cta: "Qual é a taxa de no-show na sua clínica? Comenta aqui." },
+  ]},
+  { dia: 5, reels: [
+    { seg: "EMPRESAS", pub: "Corretores", tema: "IA que qualifica leads imobiliários", gancho: "Corretor de imóveis perde metade do dia atendendo cliente que não tem perfil. Tem solução.", roteiro: "Lead chega pelo portal imobiliário.\n\nCorretor para tudo para ligar.\n\nConversa 20 minutos. Descobre que o cliente quer algo que você não tem.\n\nTempo perdido.\n\nCom um agente de IA, antes de qualquer ligação a IA já conversa com o lead.\n\nDescobre o que ele quer, qual o orçamento, se é para morar ou investir.\n\nSó chega para você o lead qualificado. Pronto para visita.\n\nVocê troca 10 ligações improdutivas por 2 visitas com chances reais de fechamento.", dicas: "Use linguagem do mercado imobiliário. Foque na economia de tempo.", cta: "Corretor ou imobiliária? Me conta quantos leads você atende por dia." },
+    { seg: "EMPRESAS", pub: "Agências", tema: "Automatize o onboarding de clientes", gancho: "O primeiro mês com um novo cliente define se ele fica ou vai embora.", roteiro: "Novo cliente fechou. Você está feliz.\n\nMas agora começa o trabalho manual: coleta de informações, acesso a ferramentas, alinhamento de expectativas.\n\nCom automação, assim que o contrato é assinado, um fluxo é disparado.\n\nA IA coleta todas as informações. Solicita os acessos. Envia o cronograma do projeto.\n\nManda os materiais de boas-vindas.\n\nO cliente sente que foi recebido com profissionalismo.\n\nVocê não gastou nenhuma hora com isso.", dicas: "Mostre exemplos de mensagens automáticas.", cta: "Agência ou consultoria? Me conta como é seu onboarding hoje." },
+    { seg: "SAÚDE", pub: "Psicólogos", tema: "Automação sem perder o lado humano", gancho: "Psicólogo não pode automatizar o atendimento. Mas pode automatizar tudo que não é atendimento.", roteiro: "A consulta é sagrada. O vínculo terapêutico é insubstituível.\n\nMas a parte administrativa? Pode e deve ser automatizada.\n\nConfirmação de consulta: automático.\n\nLembrete de sessão: automático.\n\nCobrança e link de pagamento: automático.\n\nResposta a dúvidas sobre horários: automático.\n\nVocê fica 100% focado no atendimento ao paciente.\n\nSem precisar ficar olhando o celular entre uma sessão e outra.", dicas: "Tom calmo e acolhedor. Ambiente neutro e tranquilo.", cta: "Profissional de saúde mental aqui? Me conta como organiza sua agenda." },
+  ]},
+  { dia: 6, reels: [
+    { seg: "EMPRESAS", pub: "Restaurantes", tema: "Pedidos automáticos no WhatsApp", gancho: "Restaurante que ainda anota pedido na mão está perdendo dinheiro e cliente.", roteiro: "Cliente abre o WhatsApp e manda mensagem para o restaurante.\n\nSem automação: alguém precisa ler, anotar, confirmar, mandar para a cozinha.\n\nCom automação: a IA recebe o pedido, mostra o cardápio, coleta o endereço, processa o pagamento e manda para a cozinha.\n\nTudo em menos de 2 minutos. Sem um funcionário sequer envolvido.\n\nErro de pedido? Zero. Porque o cliente escolheu e confirmou.\n\nFila de mensagem? Zero. A IA atende todo mundo ao mesmo tempo.", dicas: "Grave em ambiente de cozinha ou balcão. Mostre o celular com a conversa.", cta: "Restaurante, lanchonete ou delivery? Me conta o segmento." },
+    { seg: "EMPRESAS", pub: "Academias", tema: "Captação e retenção de alunos com IA", gancho: "Academia perde aluno todo mês por falta de acompanhamento. Tem como resolver com IA.", roteiro: "Lead entra no Instagram e manda mensagem querendo saber sobre a academia.\n\nSe demorar para responder, ele vai para a academia da esquina.\n\nCom automação, resposta imediata. IA apresenta planos, pergunta o objetivo do aluno, oferece aula experimental.\n\nAluno entra. Primeiro mês passa. IA já manda mensagem de acompanhamento.\n\nViu que o aluno faltou três vezes seguidas? Manda mensagem de motivação automática.\n\nMenos churn. Mais receita recorrente.", dicas: "Grave na academia. Tom energético.", cta: "Academia ou personal? Me conta sua maior dificuldade com alunos." },
+    { seg: "SAÚDE", pub: "Dentistas", tema: "Menos faltas, mais procedimentos", gancho: "Dentista perde em média 30% da receita por causa de faltas. Tem como mudar isso.", roteiro: "Procedimento demorado, equipamento preparado, horário bloqueado.\n\nE o paciente não aparece.\n\nCom automação, a sequência de lembretes começa 72 horas antes.\n\nWhatsApp com link de confirmação. Se não confirmar, a IA tenta de novo.\n\nSe cancelar, o sistema notifica automaticamente quem está na lista de espera.\n\nO horário é preenchido. A receita é mantida.\n\nDentistas reduzem faltas em até 65% com esse sistema.", dicas: "Ambiente odontológico. Tom focado em resultado financeiro.", cta: "Dentista ou clínica odontológica? Me conta nos comentários." },
+  ]},
+  { dia: 7, reels: [
+    { seg: "EMPRESAS", pub: "Todos", tema: "O que acontece quando você implementa IA", gancho: "Vou te contar o que acontece nos primeiros 30 dias depois de implementar IA.", roteiro: "Semana 1: você sente estranho. A IA está respondendo por você.\n\nMas os clientes não percebem. E as respostas são mais rápidas do que antes.\n\nSemana 2: você começa a ver os números. Menos mensagens sem resposta. Mais agendamentos.\n\nSemana 3: sua equipe respira. Parou de ficar soterrada no WhatsApp.\n\nSemana 4: você olha para o mês e vê mais resultado com o mesmo time.\n\nMês 2 em diante: você não consegue mais imaginar trabalhar sem IA.", dicas: "Formato pessoal, como conversa. Tom honesto e próximo.", cta: "Que semana desse processo você está? Comenta aqui." },
+    { seg: "EMPRESAS", pub: "Iniciantes", tema: "Por onde começar com automação", gancho: "Quer automatizar o seu negócio mas não sabe por onde começar? Começa aqui.", roteiro: "Passo 1: mapeie onde você perde mais tempo.\n\nNormalmente é no atendimento inicial ou no agendamento.\n\nPasso 2: automatize só esse processo primeiro.\n\nNão tenta automatizar tudo de uma vez.\n\nPasso 3: mede o resultado.\n\nTempo economizado, leads respondidos, agendamentos realizados.\n\nPasso 4: expande para o próximo processo.\n\nEm 3 meses, você tem uma operação praticamente automatizada.", dicas: "Use passos visuais na tela. Tom didático e encorajador.", cta: "Qual é o processo que mais te consome hoje? Comenta aqui." },
+    { seg: "SAÚDE", pub: "Clínicas", tema: "CRM para clínicas de saúde", gancho: "Clínica que não tem CRM está perdendo pacientes e nem sabe quais.", roteiro: "CRM não é só coisa de empresa de vendas.\n\nClínica de saúde precisa tanto quanto qualquer negócio.\n\nSem CRM: paciente que não voltou some no histórico. Você não sabe quando foi a última consulta.\n\nCom CRM integrado à IA: o sistema identifica automaticamente pacientes que não voltam há mais de 3 meses.\n\nA IA manda mensagem personalizada de acompanhamento.\n\nAlguns vão agendar. Outros vão indicar.\n\nClientes inativos são uma mina de ouro que a maioria das clínicas ignora.", dicas: "Mostre tela de CRM. Tom educativo.", cta: "Sua clínica tem CRM hoje? Comenta sim ou não." },
+  ]},
+  { dia: 8, reels: [
+    { seg: "EMPRESAS", pub: "Todos", tema: "Bastidores de uma automação real", gancho: "Vou te mostrar ao vivo como uma automação de IA funciona por dentro.", roteiro: "Isso aqui é um fluxo de automação real que configurei para um cliente.\n\nQuando o cliente manda mensagem no WhatsApp, esse bloco recebe.\n\nEsse segundo bloco identifica a intenção: agendamento, dúvida ou orçamento.\n\nDependendo do que é, ele vai para um caminho diferente.\n\nAqui ele consulta a agenda. Aqui ele responde com as informações da empresa.\n\nTudo em menos de 3 segundos. Do zero ao agendamento confirmado.\n\nNão é mágica. É lógica bem construída.", dicas: "Grave a tela do computador com o fluxo real.", cta: "Ficou alguma dúvida? Me pergunta nos comentários." },
+    { seg: "EMPRESAS", pub: "Donos", tema: "IA que nunca pede aumento", gancho: "Meu melhor funcionário nunca chega atrasado, nunca falta e nunca pede aumento.", roteiro: "Esse funcionário responde 500 clientes por dia.\n\nTrabalha sem parar.\n\nNão tem dia ruim. Não fica de mau humor com cliente difícil.\n\nNunca esquece de fazer follow-up. Nunca perde um lead.\n\nEsse funcionário é um agente de IA.\n\nE o custo mensal é uma fração do salário de um atendente humano.\n\nNão estou dizendo para você demitir sua equipe.\n\nEstou dizendo que para tarefas repetitivas, IA é simplesmente imbatível.", dicas: "Tom bem-humorado no início, sério no final.", cta: "Qual tarefa do seu negócio mais merece ser automatizada? Comenta." },
+    { seg: "SAÚDE", pub: "Nutricionistas", tema: "Acompanhamento de pacientes automatizado", gancho: "Nutricionista que acompanha 50 pacientes não consegue checar todos manualmente toda semana.", roteiro: "Com automação, a IA manda mensagem de check-in semanal para cada paciente automaticamente.\n\nColeta o peso, as refeições, o nível de energia.\n\nOrganiza tudo no painel para você revisar.\n\nVocê analisa os dados em 10 minutos e dá feedback personalizado.\n\nMesmo acompanhamento. Um décimo do tempo.", dicas: "Tom próximo e especializado. Exemplos práticos da rotina do nutricionista.", cta: "Nutricionista aqui? Me conta quantos pacientes você acompanha." },
+  ]},
+  { dia: 9, reels: [
+    { seg: "EMPRESAS", pub: "Vendas", tema: "IA que qualifica e aquece leads", gancho: "Vendedor gasta 80% do tempo com lead frio. Automação inverte essa equação.", roteiro: "Lead entra pelo anúncio.\n\nSem automação: alguém precisa responder, qualificar, entender a necessidade.\n\nMuito lead frio. Muito tempo perdido.\n\nCom automação: a IA entra antes do vendedor.\n\nFaz as perguntas certas. Entende o estágio do lead.\n\nSe estiver quente, avisa o vendedor com todas as informações já coletadas.\n\nSe estiver frio, a IA nutre com conteúdo até ele estar pronto.\n\nVendedor só fala com quem está pronto para comprar.", dicas: "Use linguagem de vendas. Tom ágil e focado em resultado.", cta: "Você está na área de vendas? Me conta como é seu processo hoje." },
+    { seg: "EMPRESAS", pub: "Pequenos negócios", tema: "Não precisa ser grande para ter IA", gancho: "Automação com IA não é só para grandes empresas. Pequeno negócio precisa mais ainda.", roteiro: "Grande empresa tem 10 atendentes.\n\nPequeno negócio tem você.\n\nQuando você está em reunião ou atendimento, quem está respondendo no WhatsApp?\n\nNinguém.\n\nE cada mensagem sem resposta é um cliente em risco.\n\nCom automação, o tamanho do negócio não limita o atendimento.\n\nA IA trabalha quando você não pode.\n\nPequeno negócio com atendimento de grande empresa. Essa é a vantagem.", dicas: "Tom inclusivo e acessível.", cta: "Qual o seu negócio? Me conta nos comentários." },
+    { seg: "SAÚDE", pub: "Fisioterapeutas", tema: "Agenda e produtividade automatizadas", gancho: "Fisioterapeuta ainda faz tudo manual está gastando 2 horas por dia que poderia estar atendendo.", roteiro: "Cada sessão tem evolução. Cada evolução leva tempo.\n\nCom 8 atendimentos por dia, são horas de documentação.\n\nAutomação organiza tudo ao redor.\n\nAgendamento automático. Lembrete para o paciente. Confirmação de sessão.\n\nHistórico de atendimentos acessível em segundos.\n\nMenos tempo em processo. Mais tempo em atendimento.\n\nMais atendimentos por dia. Mais receita.", dicas: "Tom técnico mas acessível. Foco em produtividade clínica.", cta: "Fisioterapeuta aqui? Me conta quantos pacientes você atende por dia." },
+  ]},
+  { dia: 10, reels: [
+    { seg: "EMPRESAS", pub: "Financeiro", tema: "Cobrança automática sem constrangimento", gancho: "A parte mais desconfortável de qualquer negócio é cobrar. IA faz isso por você.", roteiro: "Boleto venceu.\n\nVocê precisa ligar para o cliente. Que constrangimento.\n\nCom automação, a cobrança é automática, personalizada e sem pressão.\n\nNo dia do vencimento: lembrete amigável.\n\nTrês dias depois: mensagem com link para regularizar.\n\nUma semana depois: última notificação.\n\nTom profissional, sem ser agressivo.\n\nEmpresas que automatizam cobrança recuperam em média 30% mais inadimplência.", dicas: "Tom sério mas não pesado. Foque na solução.", cta: "Você faz cobrança manual hoje? Comenta como é o seu processo." },
+    { seg: "EMPRESAS", pub: "Recorrentes", tema: "Retenção é mais barata que captação", gancho: "Captar um novo cliente custa 5 vezes mais do que reter um que já tem.", roteiro: "Cliente antigo é ouro.\n\nEle já te conhece. Já confia. Já comprou.\n\nMas a maioria das empresas foca só em novos clientes e esquece quem já está dentro.\n\nCom automação, nenhum cliente fica esquecido.\n\nAniversário? A IA manda mensagem.\n\nFaz 3 meses que não compra? A IA aciona reengajamento.\n\nNovo produto? A IA avisa os clientes mais propensos.\n\nCliente que se sente visto, fica. E indica.", dicas: "Tom estratégico. Use dados de LTV.", cta: "Você tem algum processo de retenção hoje? Comenta sim ou não." },
+    { seg: "SAÚDE", pub: "Clínicas", tema: "Triagem automática de pacientes", gancho: "Antes de o paciente chegar à recepção, a IA já sabe o que ele precisa.", roteiro: "Paciente manda mensagem para a clínica.\n\nSem automação: recepcionista pergunta nome, queixa, plano de saúde, disponibilidade. Um por um.\n\nCom automação: a IA faz a triagem completa.\n\nColeta sintomas, urgência, plano de saúde, preferência de médico e horário.\n\nJá direciona para a especialidade correta.\n\nRecepcionista recebe o paciente já triado.\n\nAtendimento mais rápido. Paciente mais satisfeito. Equipe mais eficiente.", dicas: "Tom técnico e clínico. Foco na eficiência operacional.", cta: "Clínica multiprofissional? Me conta o segmento." },
+  ]},
+];
 const PILLARS = ["Autoridade em IA", "Educação do mercado", "Prova social", "Bastidores de automação", "Conteúdo viral"];
 const TRIGGERS = ["Curiosidade", "Medo de ficar para trás", "Dor financeira", "Prova social", "Quebra de crença", "Choque", "Oportunidade", "Transformação", "Visão de futuro", "Autoridade", "Resultado", "Diagnóstico", "Analogia simples"];
 const FMT = { "REELS": { color: "#f97316", bg: "#fff7ed" }, "CARROSSEL": { color: "#7c3aed", bg: "#f5f3ff" }, "POST FEED": { color: "#0891b2", bg: "#ecfeff" } };
@@ -102,7 +154,9 @@ export default function App() {
   const [temaInput, setTemaInput] = useState("");
   const [copied, setCopied] = useState(null);
   const [expanded, setExpanded] = useState(null);
-  const [plannerOpen, setPlannerOpen] = useState(null);
+ const [plannerOpen, setPlannerOpen] = useState(null);
+const [reelsOpen, setReelsOpen] = useState(null);
+const [reelsDone, setReelsDone] = useState({});
   const [trends, setTrends] = useState([]);
   const [selTrends, setSelTrends] = useState([]);
   const [loadingTrends, setLoadingTrends] = useState(false);
@@ -292,7 +346,7 @@ try {
             </div>
           </div>
           <nav style={{ display: "flex", gap: 2, background: "#f5f5f7", borderRadius: 12, padding: 4 }}>
-            {[["gerar", "Gerar"], ["historico", "Histórico"], ["planner", "Planner 30D"]].map(([id, label]) => (
+            {[["gerar", "Gerar"], ["historico", "Histórico"], ["planner", "Planner 30D"], ["reels", "Reels 30D"]].map(([id, label]) => (
               <button key={id} className="tab-btn" onClick={() => setTab(id)} style={{ background: tab === id ? "#fff" : "transparent", color: tab === id ? "#6366f1" : "#6b7280", boxShadow: tab === id ? "0 1px 4px rgba(0,0,0,.1)" : "none" }}>{label}</button>
             ))}
           </nav>
@@ -475,6 +529,81 @@ try {
         )}
 
         {tab === "planner" && (
+      {tab === "reels" && (
+  <div className="fade-in">
+    <div style={{ marginBottom: 28 }}>
+      <h2 style={{ fontWeight: 800, fontSize: 26, color: "#111", letterSpacing: "-0.5px" }}>🎬 Reels 30 Dias</h2>
+      <p style={{ color: "#9ca3af", fontSize: 14, marginTop: 4 }}>3 reels por dia · 70% Empresas · 30% Saúde · Clique para ver o roteiro</p>
+      <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#6366f1", background: "#eef2ff", padding: "4px 12px", borderRadius: 8, fontWeight: 700 }}>🏢 EMPRESAS</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#059669", background: "#ecfdf5", padding: "4px 12px", borderRadius: 8, fontWeight: 700 }}>🏥 SAÚDE</div>
+        <div style={{ fontSize: 12, color: "#9ca3af", padding: "4px 12px" }}>{Object.keys(reelsDone).filter(k => reelsDone[k]).length} / {REELS_PLANNER.reduce((a, d) => a + d.reels.length, 0)} gravados</div>
+      </div>
+    </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {REELS_PLANNER.map((diaObj) => (
+        <div key={diaObj.dia} className="card fade-up" style={{ overflow: "hidden" }}>
+          <div style={{ padding: "16px 22px", background: "linear-gradient(135deg,#f9fafb,#f3f4f6)", borderBottom: "1px solid #f3f4f6", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 11, background: "linear-gradient(135deg,#6366f1,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>{diaObj.dia}</span>
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 15, color: "#111" }}>Dia {diaObj.dia}</div>
+                <div style={{ fontSize: 11, color: "#9ca3af" }}>{diaObj.reels.length} reels · {diaObj.reels.filter(r => reelsDone[`${diaObj.dia}-${diaObj.reels.indexOf(r)}`]).length} gravados</div>
+              </div>
+            </div>
+            <button onClick={() => setReelsOpen(reelsOpen === diaObj.dia ? null : diaObj.dia)} style={{ background: "none", border: "none", color: "#6366f1", fontSize: 20, cursor: "pointer" }}>
+              {reelsOpen === diaObj.dia ? "▾" : "▸"}
+            </button>
+          </div>
+          {reelsOpen === diaObj.dia && (
+            <div className="fade-up" style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 20 }}>
+              {diaObj.reels.map((reel, idx) => {
+                const key = `${diaObj.dia}-${idx}`;
+                const done = reelsDone[key];
+                return (
+                  <div key={idx} style={{ border: `2px solid ${done ? "#bbf7d0" : reel.seg === "EMPRESAS" ? "#e0e7ff" : "#d1fae5"}`, borderRadius: 16, padding: 20, background: done ? "#f0fdf4" : "#fafafa", transition: "all .2s" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: reel.seg === "EMPRESAS" ? "#6366f1" : "#059669", background: reel.seg === "EMPRESAS" ? "#eef2ff" : "#ecfdf5", padding: "3px 10px", borderRadius: 7 }}>{reel.seg === "EMPRESAS" ? "🏢" : "🏥"} {reel.seg}</span>
+                        <span style={{ fontSize: 10, color: "#9ca3af", background: "#f3f4f6", padding: "3px 10px", borderRadius: 7 }}>{reel.pub}</span>
+                      </div>
+                      <button onClick={() => setReelsDone(p => ({ ...p, [key]: !p[key] }))} style={{ padding: "6px 14px", borderRadius: 10, border: `2px solid ${done ? "#22c55e" : "#e5e7eb"}`, background: done ? "#f0fdf4" : "#fff", color: done ? "#16a34a" : "#9ca3af", fontFamily: "inherit", fontWeight: 700, fontSize: 11, cursor: "pointer", transition: "all .15s", whiteSpace: "nowrap" }}>
+                        {done ? "✅ Gravado" : "○ Marcar"}
+                      </button>
+                    </div>
+                    <div style={{ fontWeight: 800, fontSize: 17, color: "#111", marginBottom: 10, letterSpacing: "-0.3px" }}>{reel.tema}</div>
+                    <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "10px 14px", marginBottom: 12 }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>🪝 GANCHO</div>
+                      <p style={{ fontSize: 13, color: "#92400e", fontStyle: "italic", lineHeight: 1.5 }}>"{reel.gancho}"</p>
+                    </div>
+                    <div style={{ marginBottom: 12 }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 6 }}>🎬 ROTEIRO</div>
+                      <div style={{ background: "#f9fafb", borderRadius: 10, padding: "12px 14px" }}>
+                        <p style={{ fontSize: 13, color: "#374151", whiteSpace: "pre-wrap", lineHeight: 1.8 }}>{reel.roteiro}</p>
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                      <div style={{ background: "#f0fdf4", borderRadius: 10, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>📹 DICAS</div>
+                        <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.5 }}>{reel.dicas}</p>
+                      </div>
+                      <div style={{ background: "#eef2ff", borderRadius: 10, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "#9ca3af", marginBottom: 4 }}>📣 CTA</div>
+                        <p style={{ fontSize: 12, color: "#4338ca", fontWeight: 600, lineHeight: 1.5 }}>{reel.cta}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
           <div className="fade-in">
             <div style={{ marginBottom: 28 }}>
               <h2 style={{ fontWeight: 800, fontSize: 26, color: "#111", letterSpacing: "-0.5px" }}>Planner 30 Dias</h2>
